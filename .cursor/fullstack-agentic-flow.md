@@ -69,6 +69,7 @@ If the user does not know the exact API shape, recommend one before implementati
 - treat utility routes such as auth, onboarding gates, and setup screens like product workflows, not marketing surfaces
 - make cache and freshness rules explicit when data crosses the backend/frontend boundary
 - keep secrets and durable auth trust on the backend side whenever the architecture allows it
+- when building public-facing SaaS surfaces, prefer predictable high-conversion structure over novelty: clear hero, proof, real product demo, stepwise explanation, pricing/FAQ, and repeated CTA
 - for time-boxed app work, avoid placeholder marketing copy and verbose explanatory UI
 - when frontend work is involved, prefer practical product UX over decorative layout filler
 - when frontend work is involved, design the end-to-end flow first and ensure loading, empty, error, success, and recovery states are part of the feature rather than follow-up polish

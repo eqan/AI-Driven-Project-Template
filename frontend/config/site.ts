@@ -10,6 +10,12 @@ export type WorkspaceSignal = {
   note: string;
 };
 
+export type ProofMetric = {
+  value: string;
+  label: string;
+  note: string;
+};
+
 export type ProductArea = {
   title: string;
   href: string;
@@ -50,6 +56,12 @@ export type BackendDomain = {
   description: string;
 };
 
+export type CacheScenario = {
+  title: string;
+  recommendation: string;
+  description: string;
+};
+
 export type QuickLink = {
   label: string;
   href: string;
@@ -60,9 +72,9 @@ export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
   name: "Project Template",
-  productTagline: "Protected product workspace",
+  productTagline: "Operator-ready SaaS workspace",
   description:
-    "A SaaS-ready Next.js frontend shaped for protected routes, reusable sections, and clean backend integration.",
+    "A SaaS-ready Next.js frontend shaped for protected routes, predictable product surfaces, and clean backend integration.",
   navItems: [
     {
       label: "Overview",
@@ -85,6 +97,28 @@ export const siteConfig = {
       description: "Integration posture for auth, tickets, stats, ingestion, and chat.",
     },
   ] satisfies NavItem[],
+  proofMetrics: [
+    {
+      value: "4",
+      label: "Core routes",
+      note: "Overview, architecture, playbook, and backend mapping all follow the same workspace pattern.",
+    },
+    {
+      value: "1",
+      label: "Auth path",
+      note: "Public sign-in stays isolated so product routes keep one protected shell and one clear trust boundary.",
+    },
+    {
+      value: "3",
+      label: "Next modules",
+      note: "Stats, ticketing, and chat can land without redesigning the app frame again.",
+    },
+    {
+      value: "0",
+      label: "Filler sections",
+      note: "Every block is now meant to orient, prove readiness, or move the next implementation decision forward.",
+    },
+  ] satisfies ProofMetric[],
   workspaceSignals: [
     {
       value: "Public + protected layouts",
@@ -111,53 +145,53 @@ export const siteConfig = {
     {
       title: "Workspace overview",
       href: "/",
-      status: "Live now",
+      status: "Start here",
       description:
-        "A real product home that orients the team around modules, readiness, and next actions instead of a template hero.",
+        "The operating page for product posture, route readiness, and what the next build steps should be.",
       outcome:
-        "Use this as the baseline surface for dashboard summaries, launch checklists, and module entry points.",
+        "Use this as the baseline for dashboards, launch checklists, and operator-facing summaries.",
     },
     {
       title: "Architecture guide",
       href: "/architecture",
-      status: "System doc",
+      status: "System map",
       description:
-        "Shows how route groups, the app shell, and centralized helpers work together as the app grows.",
+        "Shows how route groups, shared shell ownership, and integration helpers fit together.",
       outcome:
-        "Keeps future contributors aligned without repeating the same structure explanation in every task.",
+        "Keeps future contributors aligned without re-explaining the whole app in every task.",
     },
     {
       title: "Delivery playbook",
       href: "/playbook",
-      status: "Operator doc",
+      status: "Build rhythm",
       description:
-        "Captures the implementation loop, state discipline, and review standards for new frontend work.",
+        "Captures the repeatable flow for shipping new product surfaces without losing UX discipline.",
       outcome:
-        "Makes AI-assisted changes more consistent and easier to extend under deadline pressure.",
+        "Makes human and AI-assisted frontend work more consistent under deadline pressure.",
     },
     {
       title: "Backend integration map",
       href: "/backend-api",
-      status: "API-ready",
+      status: "Contract map",
       description:
-        "Connects frontend route planning to the existing auth, ticket, ingestion, chatbot, and analytics domains.",
+        "Connects frontend route planning to auth, ticketing, ingestion, chatbot, and analytics domains.",
       outcome:
-        "Helps the next data-backed route land against an existing contract instead of inventing a new one.",
+        "Helps the next data-backed route land against an existing contract instead of inventing one.",
     },
   ] satisfies ProductArea[],
   principles: [
     {
-      title: "Split access flows before features pile up",
+      title: "Separate trust boundaries early",
       description:
         "Public auth and protected workspace routes should not share the same layout contract once the app starts behaving like software.",
     },
     {
-      title: "Centralize integration helpers early",
+      title: "Keep integration logic boring",
       description:
         "Environment validation and request parsing should live behind shared helpers before more modules start making fetch calls.",
     },
     {
-      title: "Grow the product by sections, not page-sized rewrites",
+      title: "Scale by patterns, not rewrites",
       description:
         "Reusable cards, headers, and panels keep route files readable while making the next SaaS surface cheaper to add.",
     },
@@ -186,22 +220,22 @@ export const siteConfig = {
   ] satisfies ArchitectureLayer[],
   workflow: [
     {
-      title: "Confirm the route, actor, and state path",
+      title: "Define the screen before styling it",
       description:
         "Define who uses the screen, what they need to finish, and what loading, empty, error, and success look like.",
     },
     {
-      title: "Lock the contract before UI sprawl starts",
+      title: "Lock the contract early",
       description:
         "Confirm request and response shapes before wiring tables, forms, or optimistic actions around them.",
     },
     {
-      title: "Reuse shell patterns before inventing layout",
+      title: "Reuse the product skeleton",
       description:
         "Extend shared cards, shell panels, and route sections first so the product still feels like one system.",
     },
     {
-      title: "Design the full async state path",
+      title: "Design the state path, not just the happy path",
       description:
         "Treat loading, empty, recovery, and success behavior as part of the feature instead of polish for later.",
     },
@@ -281,6 +315,32 @@ export const siteConfig = {
         "Can evolve into conversation workspaces, review panels, and streaming task flows.",
     },
   ] satisfies BackendDomain[],
+  cacheScenarios: [
+    {
+      title: "Auth and current user",
+      recommendation: "Always fresh",
+      description:
+        "Use no-store and verify against the backend because stale auth data creates trust and authorization bugs.",
+    },
+    {
+      title: "Dashboard summaries",
+      recommendation: "Short-lived",
+      description:
+        "Revalidate on navigation or focus so the UI feels current without refetching every click.",
+    },
+    {
+      title: "Static product references",
+      recommendation: "Cacheable",
+      description:
+        "Public docs, feature descriptions, and reference content can use explicit revalidation windows.",
+    },
+    {
+      title: "Drafts and filters",
+      recommendation: "Browser-sticky",
+      description:
+        "Use local browser state for non-secret drafts and preferences when resuming work helps the user.",
+    },
+  ] satisfies CacheScenario[],
   quickLinks: [
     {
       label: "Review architecture",

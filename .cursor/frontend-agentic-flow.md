@@ -181,6 +181,22 @@ Pattern defaults:
 - avoid nested cards and repeated equal-width marketing-card grids as a default pattern
 - avoid stock-looking AI visuals or gradients used only to signal "AI"
 
+## Predictable SaaS Patterns
+
+For public product pages, onboarding explainers, launch pages, and founder-led SaaS surfaces, prefer a repeatable pattern language inspired by fast-moving indie products such as Marc Lou's:
+
+- start with one sharp headline, one concrete subheading, and one obvious primary CTA
+- place proof near the hero: user count, testimonials, customer logos, or a concrete credibility signal
+- show the product early with real screenshots, demos, or UI evidence instead of abstract claims
+- explain value in ordered steps or a simple progression rather than long paragraphs
+- keep sections modular and reusable: hero, proof, demo, how-it-works, feature grid, FAQ, pricing, final CTA
+- use short punchy copy that emphasizes outcome, speed, and practicality over technical exposition
+- prefer recognizable conversion patterns over experimental layouts when the goal is trust and clarity
+- repeat the primary CTA at sensible intervals instead of inventing many competing actions
+- make pages feel founder-operated and product-specific through concrete details, not generic startup language
+- borrow the structure and clarity, not the exact brand voice, wording, or visual identity
+- do not apply this public-page pattern to auth, settings, checkout, admin, or other utility routes unless the user explicitly asks for a marketing treatment
+
 ## Copy Rules
 
 - avoid filler copy, product-speak, and generic motivational text

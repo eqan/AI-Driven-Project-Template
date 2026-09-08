@@ -28,6 +28,7 @@ For frontend feature requests, the parent instructions include a clarification-f
 - keep auth and access pages especially lean: utility-first layout, one primary action, no promotional card grids unless explicitly requested
 - default to safer frontend persistence: do not drop secrets into browser storage and be explicit about cache freshness for each new data surface
 - treat browser caching as a product decision with scenarios: `no-store` for auth and user-sensitive data, short-lived or focus-based revalidation for dashboards and search, and longer caching only for public reference content
+- for public-facing SaaS pages, prefer a predictable structure with clear hero, proof, product demo, stepwise explanation, and repeated CTA rather than one-off layout experiments
 - commit to a clear aesthetic direction and avoid generic AI-generated frontend patterns
 - self-review hierarchy, spacing, states, and mobile fit before finishing
 - verify with lint, typecheck, and build

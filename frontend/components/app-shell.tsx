@@ -30,10 +30,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="mt-auto space-y-4">
               <div className="rounded-[26px] border border-white/10 bg-black/10 p-4 dark:bg-white/4">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent/80">
-                  Scale posture
+                  Proof of readiness
                 </p>
                 <div className="mt-4 space-y-3">
-                  {siteConfig.workspaceSignals.slice(0, 3).map((signal) => (
+                  {siteConfig.proofMetrics.slice(0, 3).map((signal) => (
                     <div
                       key={signal.label}
                       className="rounded-[20px] border border-white/10 bg-white/5 p-3"
@@ -44,6 +44,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       <p className="mt-2 text-sm font-semibold text-foreground">
                         {signal.value}
                       </p>
+                      <p className="mt-2 text-sm leading-6 text-muted">{signal.note}</p>
                     </div>
                   ))}
                 </div>
@@ -51,7 +52,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
               <div className="rounded-[26px] border border-white/10 bg-black/10 p-4 dark:bg-white/4">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent/80">
-                  Build rhythm
+                  Product rules
+                </p>
+                <div className="mt-4 space-y-3">
+                  {siteConfig.principles.map((principle) => (
+                    <div
+                      key={principle.title}
+                      className="rounded-[20px] border border-white/10 bg-white/5 p-3"
+                    >
+                      <p className="text-sm font-semibold text-foreground">{principle.title}</p>
+                      <p className="mt-2 text-sm leading-6 text-muted">
+                        {principle.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-[26px] border border-white/10 bg-black/10 p-4 dark:bg-white/4">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent/80">
+                  Go next
                 </p>
                 <div className="mt-4 space-y-3">
                   {siteConfig.quickLinks.map((link) => (
