@@ -67,10 +67,10 @@ Use `runtime.json` to enable or disable template capabilities:
 
 This keeps the same codebase usable for both a slim interview demo and a fuller production-style walkthrough.
 
-## Recommended Next Refactors
+## Completed Refinements
 
-1. Move repeated auth/token patterns into a shared dependency module.
-2. Migrate remaining services to `session_scope()` or repository helpers.
-3. Add a small `integrations/` layer so LLM, Pinecone, Voyage, and Firecrawl adapters are isolated from domain services.
-4. Add contract tests around JSON runtime config and feature-flag combinations.
-5. Add Redis as an explicit dependency only when you are ready to use it in the environment.
+1. Shared auth dependencies now centralize repeated token verification patterns.
+2. Services and scheduled DB jobs now prefer `session_scope()` instead of repeating manual session cleanup.
+3. A dedicated `integrations/` layer isolates Gemini, DeepSeek, Pinecone, Voyage, and Firecrawl provider logic from domain services.
+4. Runtime configuration and feature-flag behavior are covered by contract-style tests.
+5. Redis is now an explicit dependency, while the cache layer still defaults to in-memory TTL until the environment is configured to use Redis.

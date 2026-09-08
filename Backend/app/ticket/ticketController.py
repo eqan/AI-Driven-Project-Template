@@ -1,11 +1,11 @@
-from ticket.ticketService import ticket_service
-from ticket.dtos.ticket import TicketUpdate
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Depends, Request
+
 from config.config import limiter
-from users.usersService import users_service
-from utils.security import enforce_payload_size
-from fastapi import Depends
 from config.settings import settings
+from dependencies.auth import require_authenticated_user_id
+from ticket.dtos.ticket import TicketUpdate
+from ticket.ticketService import ticket_service
+from utils.security import enforce_payload_size
 
 router = APIRouter()
 @router.put("/ticket", dependencies=[Depends(enforce_payload_size)], tags=["Ticket"])
@@ -42,6 +42,7 @@ async def get_ticket(
 @limiter.limit(settings.runtime.rate_limits.ticket)
 async def get_all_tickets_by_user_id(
     request: Request,
+    user_id: int = Depends(require_authenticated_user_id),
 ):
     """
     This endpoint gets all tickets for a user.\n
@@ -49,7 +50,4 @@ async def get_all_tickets_by_user_id(
     - token: str
         The token for authentication.
     """
-    user_id = await users_service.verify_jwt_token_for_chatbot(request)
-    if user_id is None:
-        raise HTTPException(status_code=400, detail="User is blacklisted")
     return ticket_service.get_all_tickets_by_user_id(user_id)

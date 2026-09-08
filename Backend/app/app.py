@@ -58,9 +58,10 @@ def create_app() -> FastAPI:
         if scheduler.running:
             scheduler.shutdown()
 
-    @app.get("/sentry-debug")
-    async def trigger_error():
-        division_by_zero = 1 / 0
+    if runtime.features.enable_sentry:
+        @app.get("/sentry-debug")
+        async def trigger_error():
+            division_by_zero = 1 / 0
 
     return app
 

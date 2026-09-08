@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 import httpx
+from dependencies.auth import require_authenticated_payload
 from users.dtos.authCode import AuthCodePayload
 from users.usersService import users_service
 
@@ -20,7 +21,7 @@ async def google_login(payload: AuthCodePayload):
         raise HTTPException(status_code=400, detail="Google authentication failed")
 
 @router.get("/verify-token", tags=["Users"])
-async def verify_token_route(user_payload: dict = Depends(users_service.verify_jwt_token)):
+async def verify_token_route(user_payload: dict = Depends(require_authenticated_payload)):
     """
     This endpoint verifies a JWT token and returns the user payload.\n
     Body Parameters:

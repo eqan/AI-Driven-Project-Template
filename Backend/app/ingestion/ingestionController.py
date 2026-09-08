@@ -2,16 +2,16 @@ from fastapi import APIRouter
 from ingestion.dtos.ingestion import Ingestion, SearchDTO
 from ingestion.ingestionService import ingestion_service
 from fastapi import Depends 
-from users.usersService import users_service
 from config.config import limiter
 from config.settings import settings
+from dependencies.auth import require_authenticated_payload
 from fastapi import Request
 
 router = APIRouter(prefix="/ingestion")
 
-@router.post("/scrape-website", tags=["ingestion"], dependencies=[Depends(users_service.verify_jwt_token)])
+@router.post("/scrape-website", tags=["ingestion"])
 @limiter.limit(settings.runtime.rate_limits.ingestion_scrape)
-async def scrape_website(ingestion: Ingestion, request: Request):
+async def scrape_website(ingestion: Ingestion, request: Request, _: dict = Depends(require_authenticated_payload)):
     """
     This endpoint scrapes, purifies and ingests data into the system through the relevant urls provided.
 
@@ -29,9 +29,9 @@ async def scrape_website(ingestion: Ingestion, request: Request):
     """
     return ingestion_service.scrape_and_ingest_data(ingestion)
 
-@router.get("/search", tags=["ingestion"], dependencies=[Depends(users_service.verify_jwt_token)])
+@router.get("/search", tags=["ingestion"])
 @limiter.limit(settings.runtime.rate_limits.ingestion_search)
-async def search_in_pinecone(searchDTO: SearchDTO, request: Request):
+async def search_in_pinecone(searchDTO: SearchDTO, request: Request, _: dict = Depends(require_authenticated_payload)):
     """
     This endpoint allows searching within the Pinecone VectorDB using the provided search criteria.
 

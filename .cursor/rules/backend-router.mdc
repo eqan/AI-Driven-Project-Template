@@ -1,0 +1,17 @@
+---
+description: Route backend work to the shared backend instruction file and follow existing architecture and extension patterns
+globs:
+  - Backend/**/*.py
+  - Backend/**/*.json
+  - Backend/**/*.md
+  - Backend/run.sh
+  - Backend/.env.example
+  - readme.md
+alwaysApply: false
+---
+
+Use the backend parent instructions whenever the task involves backend code, tests, runtime configuration, backend docs, or architecture decisions.
+
+Read and follow:
+
+@.cursor/backend-agentic-flow.md

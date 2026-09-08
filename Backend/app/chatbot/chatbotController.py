@@ -1,33 +1,29 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 from chatbot.dtos.chatbot import ChatbotRequest
 from chatbot.dtos.chatbot_response import ChatbotResponse
 from config.config import limiter
 from config.settings import settings
-from users.usersService import users_service
 from chatbot.chatbotService import chatbot_service
+from dependencies.auth import require_authenticated_user_id
 from utils.security import enforce_payload_size
 
 router = APIRouter()
 
 @router.post("/chatbot-response", response_model=ChatbotResponse, dependencies=[Depends(enforce_payload_size)], tags=["Chatbot"])
 @limiter.limit(settings.runtime.rate_limits.chatbot)
-async def chatbot_response(chatbot_request: ChatbotRequest, request: Request):
+async def chatbot_response(chatbot_request: ChatbotRequest, request: Request, user_id: int = Depends(require_authenticated_user_id)):
     """Non-streaming chatbot endpoint (backward-compatible). Returns a single JSON response."""
-    try:
-        user_id = await users_service.verify_jwt_token_for_chatbot(request)
-        if user_id is None:
-            raise HTTPException(status_code=400, detail="User is blacklisted")
-        return await chatbot_service.generate_result(chatbot_request, user_id)
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return await chatbot_service.generate_result(chatbot_request, user_id)
 
 
 @router.post("/chatbot-response/stream", dependencies=[Depends(enforce_payload_size)], tags=["Chatbot"])
 @limiter.limit(settings.runtime.rate_limits.chatbot_stream)
-async def chatbot_response_stream(chatbot_request: ChatbotRequest, request: Request):
+async def chatbot_response_stream(
+    chatbot_request: ChatbotRequest,
+    request: Request,
+    user_id: int = Depends(require_authenticated_user_id),
+):
     """SSE streaming chatbot endpoint using a two-phase architecture.
 
     Phase 1 (Intent Classification):
@@ -46,15 +42,6 @@ async def chatbot_response_stream(chatbot_request: ChatbotRequest, request: Requ
         event: done    -> {"is_booking": bool, "is_human_handoff": bool}
         event: error   -> {"message": str, "code": int}
     """
-    try:
-        user_id = await users_service.verify_jwt_token_for_chatbot(request)
-        if user_id is None:
-            raise HTTPException(status_code=400, detail="User is blacklisted")
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
     return StreamingResponse(
         chatbot_service.stream_response_sse(chatbot_request, user_id),
         media_type="text/event-stream",
@@ -66,14 +53,11 @@ async def chatbot_response_stream(chatbot_request: ChatbotRequest, request: Requ
     )
     
 @router.get("/all-chats", tags=["Chatbot"])
-async def get_all_chats_endpoint(request: Request):
+async def get_all_chats_endpoint(request: Request, user_id: int = Depends(require_authenticated_user_id)):
     """
     This endpoint returns all chats for a user.\n
     Body Parameters:
     - token: str
         The token for authentication.
     """
-    user_id = await users_service.verify_jwt_token_for_chatbot(request)
-    if user_id is None:
-        raise HTTPException(status_code=400, detail="User is blacklisted")
     return await chatbot_service.get_all_chats(user_id)
