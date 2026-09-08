@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from base import Base
+from model_registry import Base
 from config.config import Session, engine
 
 def create_tables():

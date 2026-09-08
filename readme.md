@@ -96,6 +96,22 @@ cd Backend
 python main.py
 ```
 
+### 5. Apply the database schema
+
+Use Alembic to create the current schema in a fresh database:
+
+```bash
+cd Backend
+alembic upgrade head
+```
+
+To generate the SQL without applying it:
+
+```bash
+cd Backend
+alembic upgrade head --sql
+```
+
 ## Runtime Configuration
 
 `Backend/app/config/runtime.json` contains default operational settings such as:
