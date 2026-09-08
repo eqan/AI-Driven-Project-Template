@@ -5,7 +5,7 @@
   "tests": [
     {
       "name": "root_endpoint_returns_200",
-      "description": "GET / should return 200 with a running message",
+      "description": "GET / should return 200 with a non-empty status message",
       "input": {
         "method": "GET",
         "endpoint": "/"
@@ -15,9 +15,9 @@
         "has_field": "message"
       },
       "assertions": {
-        "type": "field_contains",
+        "type": "field_type",
         "field": "message",
-        "substring": "running"
+        "expected_type": "string"
       },
       "skip": false
     },

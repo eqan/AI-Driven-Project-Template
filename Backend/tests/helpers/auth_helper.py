@@ -1,14 +1,23 @@
 """
-Authentication Helper for AI Customer Support Widget Tests
-Provides utilities for JWT token management and authenticated requests
+Authentication helper for backend template tests.
+Provides utilities for JWT token management, refresh, and authenticated requests.
 """
 import json
 import os
-import httpx
-from typing import Dict, Optional
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Dict, Optional
+
+import httpx
+import jwt
+import requests
+from pydantic import EmailStr, TypeAdapter, ValidationError
+
+from tests.config.test_config import config
 
 PERSISTENT_USERS_FILE = Path(__file__).parent.parent / "config" / "persistent-users.json"
+INTERNAL_AUTH_HEADER = "X-Internal-Service-Secret"
+EMAIL_ADAPTER = TypeAdapter(EmailStr)
 
 
 def load_persistent_users() -> Dict:
@@ -16,6 +25,11 @@ def load_persistent_users() -> Dict:
         raise FileNotFoundError(f"Persistent users file not found: {PERSISTENT_USERS_FILE}")
     with open(PERSISTENT_USERS_FILE, 'r') as f:
         return json.load(f)
+
+
+def save_persistent_users(users_config: Dict) -> None:
+    with open(PERSISTENT_USERS_FILE, 'w') as f:
+        json.dump(users_config, f, indent=2)
 
 
 def get_test_user(user_type: str = "primary") -> Dict:
@@ -35,12 +49,116 @@ def get_auth_headers(token: str) -> Dict[str, str]:
 def get_auth_token_for_tests(user_type: str = "primary") -> str:
     user = get_test_user(user_type)
     token = user.get("token", "")
+    if config.can_auto_refresh_tokens():
+        if not token or token_expires_soon(token):
+            return refresh_persistent_test_token(user_type)
     if not token:
         raise ValueError(
             f"No token set for user '{user_type}'. "
-            f"Authenticate via /google-login and paste the token into persistent-users.json"
+            f"Configure TEST_AUTH_AUTO_REFRESH/TEST_AUTH_SHARED_SECRET or set a token in persistent-users.json"
         )
     return token
+
+
+def token_expires_soon(token: str) -> bool:
+    try:
+        payload = jwt.decode(token, options={"verify_signature": False, "verify_exp": False})
+        exp = payload.get("exp")
+        if not exp:
+            return False
+
+        expires_at = datetime.fromtimestamp(exp, tz=timezone.utc)
+        refresh_deadline = datetime.now(timezone.utc) + timedelta(
+            seconds=config.test_auth_refresh_buffer_seconds
+        )
+        return expires_at <= refresh_deadline
+    except Exception:
+        return True
+
+
+def refresh_persistent_test_token(user_type: str = "primary") -> str:
+    if not config.can_auto_refresh_tokens():
+        raise ValueError(
+            "Automatic token refresh is not configured. "
+            "Set TEST_AUTH_AUTO_REFRESH=true and TEST_AUTH_SHARED_SECRET."
+        )
+
+    users_config = load_persistent_users()
+    user = users_config["users"].get(user_type)
+    if user is None:
+        raise ValueError(f"Unknown user type: {user_type}")
+
+    email = user.get("email") or None
+    if email and not is_valid_refresh_email(email):
+        email = None
+
+    payload = {
+        "user_key": user_type,
+        "email": email,
+        "name": user.get("full_name") or None,
+    }
+
+    try:
+        response = requests.post(
+            f"{get_api_url()}{config.test_auth_refresh_endpoint}",
+            json=payload,
+            headers={
+                INTERNAL_AUTH_HEADER: config.test_auth_shared_secret,
+                "Content-Type": "application/json",
+            },
+            timeout=config.test_auth_refresh_timeout,
+        )
+    except requests.RequestException as exc:
+        raise ValueError(f"Unable to refresh token for '{user_type}': {exc}") from exc
+
+    try:
+        body = response.json()
+    except ValueError as exc:
+        snippet = response.text.strip()
+        if len(snippet) > 300:
+            snippet = f"{snippet[:300]}..."
+        raise ValueError(
+            f"Unable to refresh token for '{user_type}': non-JSON response ({response.status_code}) {snippet}"
+        ) from exc
+
+    if response.status_code != 200:
+        detail = body.get("detail") if isinstance(body, dict) else body
+        raise ValueError(
+            f"Unable to refresh token for '{user_type}': {response.status_code} {detail}"
+        )
+
+    result = body.get("result", {})
+    token = result.get("token", "")
+    issued_user = result.get("user", {})
+    if not token:
+        raise ValueError(f"Unable to refresh token for '{user_type}': missing token in response")
+
+    user["token"] = token
+    user["email"] = issued_user.get("email") or user.get("email", "")
+    user["full_name"] = issued_user.get("name") or user.get("full_name", "")
+    users_config["lastUpdated"] = datetime.now(timezone.utc).isoformat()
+    users_config["setupComplete"] = bool(users_config["users"].get("primary", {}).get("token"))
+    save_persistent_users(users_config)
+    return token
+
+
+def refresh_configured_test_tokens(user_types: Optional[list[str]] = None) -> Dict[str, str]:
+    users_config = load_persistent_users()
+    selected_user_types = user_types or list(users_config["users"].keys())
+    refreshed_tokens: Dict[str, str] = {}
+
+    for user_type in selected_user_types:
+        refreshed_tokens[user_type] = refresh_persistent_test_token(user_type)
+
+    return refreshed_tokens
+
+
+def is_valid_refresh_email(email: str) -> bool:
+    try:
+        EMAIL_ADAPTER.validate_python(email)
+        return True
+    except (ValidationError, ValueError):
+        return False
 
 
 class AuthenticatedClient:

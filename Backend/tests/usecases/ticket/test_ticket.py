@@ -145,7 +145,7 @@ def test_get_tickets_requires_auth(unauthenticated_client: APIClient):
     """GET /tickets without auth should fail."""
     response = unauthenticated_client.get("/tickets")
     actual = response.get("_status_code")
-    assert actual in (400, 422, 429), f"Expected 400/422/429 without auth, got {actual}"
+    assert actual in (401, 429), f"Expected 401/429 without auth, got {actual}"
     print("  Tickets auth requirement test passed")
 
 

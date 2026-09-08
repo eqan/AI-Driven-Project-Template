@@ -20,17 +20,18 @@ class PineconeClient:
 
     def query(self, vector: list[float], top_k: int, company_website: str):
         index = self._require_index()
-        return index.query(
+        result = index.query(
             namespace=settings.pinecone_index_name,
             vector=vector,
             top_k=top_k,
             include_metadata=True,
             filter={"company_website": {"$eq": company_website}},
         )
+        return self._normalize_result(result)
 
     def search_by_text(self, query: str, top_k: int, company_website: str):
         index = self._require_index()
-        return index.search(
+        result = index.search(
             namespace=settings.pinecone_index_name,
             query={
                 "inputs": {"text": query},
@@ -39,6 +40,7 @@ class PineconeClient:
                 "include_metadata": True,
             },
         )
+        return self._normalize_result(result)
 
     @staticmethod
     def _require_index():
@@ -46,6 +48,16 @@ class PineconeClient:
         if index is None:
             raise HTTPException(status_code=503, detail="Pinecone is not configured")
         return index
+
+    @staticmethod
+    def _normalize_result(result):
+        if hasattr(result, "to_dict"):
+            return result.to_dict()
+        if hasattr(result, "model_dump"):
+            return result.model_dump()
+        if isinstance(result, dict):
+            return result
+        return result
 
 
 pinecone_client = PineconeClient()

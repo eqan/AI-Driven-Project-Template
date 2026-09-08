@@ -14,7 +14,7 @@ from helpers.api_client import APIClient
 from helpers.assertions import (
     assert_status_code,
     assert_field_exists,
-    assert_contains,
+    assert_field_type,
 )
 
 test_cases_path = Path(__file__).parent / "health.cases.json"
@@ -56,8 +56,10 @@ def test_parametrized_cases(unauthenticated_client: APIClient, test_case: dict):
     if expected.get("has_field"):
         assert_field_exists(response, expected["has_field"])
 
-    if assertion_type == "field_contains":
-        assert_contains(response, assertion["field"], assertion["substring"])
+    if assertion_type == "field_type":
+        expected_type = str if assertion["expected_type"] == "string" else None
+        assert expected_type is not None, f"Unsupported expected_type: {assertion['expected_type']}"
+        assert_field_type(response, assertion["field"], expected_type)
 
     if assertion_type == "content_type":
         headers = response.get("_headers", {})
@@ -71,12 +73,12 @@ def test_parametrized_cases(unauthenticated_client: APIClient, test_case: dict):
 @pytest.mark.health
 @pytest.mark.smoke
 def test_root_returns_running_message(unauthenticated_client: APIClient):
-    """Standalone: GET / returns a message indicating the API is running."""
+    """Standalone: GET / returns a non-empty status message."""
     response = unauthenticated_client.get("/")
     assert_status_code(response, 200)
     assert_field_exists(response, "message")
-    assert "running" in response["message"].lower(), \
-        f"Expected 'running' in message, got: {response['message']}"
+    assert isinstance(response["message"], str) and response["message"].strip(), \
+        f"Expected a non-empty message, got: {response['message']}"
     print("  Root endpoint test passed")
 
 

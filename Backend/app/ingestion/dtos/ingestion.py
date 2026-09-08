@@ -1,20 +1,35 @@
 from pydantic import BaseModel, Field
 
 class Ingestion(BaseModel):
-    company_name: str = Field(..., description="The name of the company")
-    company_website: str = Field(..., description="The website of the company")
-    relevant_links_to_be_scraped: list[str] = Field(..., description="The relevant links to be scraped")
+    company_name: str = Field(..., min_length=1, description="The name of the company")
+    company_website: str = Field(..., min_length=1, description="The website of the company")
+    relevant_links_to_be_scraped: list[str] = Field(
+        ...,
+        min_length=1,
+        description="The relevant links to be scraped",
+    )
 
 class WebsiteScrapeResult(BaseModel):
     url: str
     markdown: str
-    description: str #ogDescription
-    title: str #ogTitle
+    description: str
+    title: str
 
 class SearchDTO(BaseModel):
-    query: str
-    company_website: str
-    top_k: int = 3
+    query: str = Field(..., min_length=1)
+    company_website: str = Field(..., min_length=1)
+    top_k: int = Field(default=3, ge=1, le=20)
+
+
+class GeneratedIngestionRecord(BaseModel):
+    summarized_content: str = Field(..., min_length=1)
+    content_type: str = Field(..., min_length=1)
+    title: str = Field(..., min_length=1)
+    section: str = Field(..., min_length=1)
+    specific_metadata: dict = Field(default_factory=dict)
+    source_url: str = Field(..., min_length=1)
+    company_name: str = Field(..., min_length=1)
+    company_website: str = Field(..., min_length=1)
 
 class IngestionData(BaseModel):
     content: str = Field(..., description="The actual text content")

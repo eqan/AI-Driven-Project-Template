@@ -4,39 +4,6 @@
   "module": "stats",
   "tests": [
     {
-      "name": "generate_stats_no_auth",
-      "description": "POST /stats without auth token should return 400 or 422",
-      "input": {
-        "method": "POST",
-        "endpoint": "/stats",
-        "body": {},
-        "no_auth": true
-      },
-      "expected": {
-        "status_code_in": [400, 422]
-      },
-      "assertions": {
-        "type": "auth_failure"
-      },
-      "skip": false
-    },
-    {
-      "name": "get_stats_no_auth",
-      "description": "GET /stats without auth token should return 400",
-      "input": {
-        "method": "GET",
-        "endpoint": "/stats",
-        "no_auth": true
-      },
-      "expected": {
-        "status_code_in": [400, 422]
-      },
-      "assertions": {
-        "type": "auth_failure"
-      },
-      "skip": false
-    },
-    {
       "name": "generate_stats_with_auth",
       "description": "POST /stats with valid auth should generate and return stats",
       "input": {

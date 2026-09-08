@@ -1,7 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
 import httpx
+from dependencies.internal import require_internal_service_secret
 from dependencies.auth import require_authenticated_payload
 from users.dtos.authCode import AuthCodePayload
+from users.dtos.testAuth import InternalTestTokenRequest
 from users.usersService import users_service
 
 router = APIRouter()
@@ -30,3 +32,13 @@ async def verify_token_route(user_payload: dict = Depends(require_authenticated_
     """
     # If the token is valid, this route will return the user payload
     return {"status": True, "user": user_payload}
+
+
+@router.post("/internal/testing/issue-token", tags=["Internal"], include_in_schema=False)
+async def issue_internal_test_token(
+    payload: InternalTestTokenRequest,
+    _: None = Depends(require_internal_service_secret),
+):
+    """Issue or refresh a deterministic test token for automated test flows."""
+    result = await users_service.issue_internal_test_token(payload)
+    return {"status": True, "message": "Internal test token issued", "result": result}

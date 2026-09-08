@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from config.settings import settings
 from database import session_scope
 from users.dtos.schemas import UserCreate
+from users.dtos.testAuth import InternalTestTokenRequest
 from users.models.enums import UserType
 from users.models.user import User
 
@@ -28,13 +29,13 @@ class UsersService:
                 response.raise_for_status()
                 user_info = response.json()
 
-            token_data = {
-                "sub": user_info["sub"],
-                "email": user_info["email"],
-                "name": user_info["name"],
-                "picture": user_info["picture"],
-                "exp": datetime.utcnow() + timedelta(days=self.ACCESS_TOKEN_EXPIRE_DAYS),
-            }
+            token_data = self._build_token_payload(
+                sub=user_info["sub"],
+                email=user_info["email"],
+                name=user_info["name"],
+                picture=user_info["picture"],
+                expires_in=timedelta(days=self.ACCESS_TOKEN_EXPIRE_DAYS),
+            )
 
             user = await self.get_user(token_data["email"])
             if user is None:
@@ -52,12 +53,55 @@ class UsersService:
             else:
                 await self.update_last_time_service_used(token_data["email"])
 
-            token = jwt.encode(token_data, self.SECRET_KEY, algorithm=self.ALGORITHM)
+            token = self._encode_token(token_data)
             user_info["token"] = token
             return {"token": token, "user_info": user_info}
         except Exception as e:
             print("This is the error", e)
             raise HTTPException(status_code=500, detail=str(e))
+
+    async def issue_internal_test_token(self, payload: InternalTestTokenRequest):
+        profile = self._resolve_internal_test_profile(payload)
+
+        user = await self.get_user(profile["email"])
+        if user is None:
+            user = await self.create_user(
+                UserCreate(
+                    email=profile["email"],
+                    name=profile["name"],
+                    profile_url=profile["profile_url"],
+                    type=profile["type"],
+                    last_time_service_used=datetime.now(),
+                    blackListed=False,
+                    notes=profile["notes"],
+                )
+            )
+        else:
+            user = await self._sync_internal_test_user(user.email, profile)
+
+        if user.blackListed:
+            raise HTTPException(status_code=403, detail="Test user is blacklisted")
+
+        token_payload = self._build_token_payload(
+            sub=profile["sub"],
+            email=user.email,
+            name=user.name,
+            picture=user.profile_url,
+            expires_in=timedelta(minutes=settings.internal_test_token_ttl_minutes),
+        )
+        token = self._encode_token(token_payload)
+
+        return {
+            "token": token,
+            "expires_at": token_payload["exp"].isoformat(),
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "name": user.name,
+                "profile_url": user.profile_url,
+                "type": user.type,
+            },
+        }
 
     async def verify_jwt_token_for_chatbot(self, request: Request):
         token = self._extract_bearer_token(request, missing_detail="Missing authentication token")
@@ -161,6 +205,64 @@ class UsersService:
         except Exception as e:
             print(f"Unexpected error in update_last_time_service_used: {str(e)}")
             raise HTTPException(status_code=500, detail=str(e))
+
+    async def _sync_internal_test_user(self, user_email: str, profile: dict):
+        try:
+            with session_scope() as session:
+                db_user = session.query(User).filter(User.email == user_email).first()
+                if db_user is None:
+                    raise HTTPException(status_code=404, detail="Test user not found")
+
+                db_user.name = profile["name"]
+                db_user.profile_url = profile["profile_url"]
+                db_user.type = profile["type"]
+                db_user.notes = profile["notes"]
+                db_user.last_time_service_used = datetime.now()
+                session.flush()
+                session.refresh(db_user)
+                return db_user
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=str(e))
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    def _build_token_payload(
+        self,
+        *,
+        sub: str,
+        email: str,
+        name: str,
+        picture: str | None,
+        expires_in: timedelta,
+    ) -> dict:
+        return {
+            "sub": sub,
+            "email": email,
+            "name": name,
+            "picture": picture or "",
+            "exp": datetime.utcnow() + expires_in,
+        }
+
+    def _encode_token(self, token_data: dict) -> str:
+        return jwt.encode(token_data, self.SECRET_KEY, algorithm=self.ALGORITHM)
+
+    def _resolve_internal_test_profile(self, payload: InternalTestTokenRequest) -> dict:
+        user_key = payload.user_key.strip().lower()
+        email = payload.email or f"qa.{user_key}@{settings.internal_test_email_domain}"
+        name = payload.name or f"QA {user_key.title()} User"
+        profile_url = payload.profile_url or f"https://example.com/profiles/{user_key}"
+        notes = payload.notes or "Managed by internal test auth token issuer"
+
+        return {
+            "sub": f"internal-test-{user_key}",
+            "email": email,
+            "name": name,
+            "profile_url": profile_url,
+            "type": payload.user_type,
+            "notes": notes,
+        }
 
     @staticmethod
     def _extract_bearer_token(request: Request, missing_detail: str) -> str:

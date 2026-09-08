@@ -1,4 +1,4 @@
-# Quick Start Guide - AI Customer Support Widget Tests
+# Quick Start Guide - Project Template Backend Tests
 
 ## Setup (5 minutes)
 
@@ -6,21 +6,36 @@
 
 ```bash
 cd Backend
-uv add --dev pytest pytest-asyncio httpx pyjwt
+uv sync --dev
 ```
 
 ### 2. Start the API Server
 
 ```bash
-cd Backend/app
-uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+cd Backend
+./run.sh
 ```
 
 Wait for: `Application startup complete`
 
 ### 3. Configure Auth Tokens
 
-Authenticate via the chatbot widget (Google OAuth), then copy the JWT from `localStorage` (`chatbotAuthToken` key) and paste it into `tests/config/persistent-users.json`:
+Preferred flow: enable internal test auth in `Backend/.env`, then auto-refresh tokens:
+
+```bash
+ENABLE_INTERNAL_TEST_AUTH=true
+INTERNAL_SERVICE_SECRET=replace-with-a-shared-secret
+TEST_AUTH_AUTO_REFRESH=true
+TEST_AUTH_SHARED_SECRET=replace-with-the-same-secret
+```
+
+Then run:
+
+```bash
+python tests/run_tests.py --refresh-tokens
+```
+
+Manual fallback: authenticate through the frontend or another trusted login path, then copy the JWT from local storage and paste it into `tests/config/persistent-users.json`:
 
 ```json
 {

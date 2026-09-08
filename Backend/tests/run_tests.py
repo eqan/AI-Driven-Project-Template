@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Test Runner for AI Customer Support Widget API
+Test Runner for Project Template Backend API
 
 Usage:
     python tests/run_tests.py                   # Run all tests
     python tests/run_tests.py chatbot           # Run chatbot tests only
     python tests/run_tests.py auth              # Run auth tests only
+    python tests/run_tests.py --refresh-tokens  # Refresh managed test JWTs
     python tests/run_tests.py --verbose         # Verbose output
     python tests/run_tests.py --fail-fast       # Stop on first failure
     python tests/run_tests.py --markers         # List all markers
@@ -23,11 +24,14 @@ from datetime import datetime, timezone
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+from tests.config.test_config import config as test_config
+from tests.helpers.auth_helper import refresh_configured_test_tokens
+
 
 def print_banner():
     print("""
 ========================================================================
-         AI Customer Support Widget — API Test Suite
+           Project Template Backend — API Test Suite
                     Powered by pytest
 ========================================================================
 """)
@@ -93,9 +97,16 @@ def list_markers():
     print('  pytest -m "not slow"           # Skip slow tests')
 
 
+def refresh_tokens_for_tests(user_type: str = 'all') -> None:
+    target_users = None if user_type == 'all' else [user_type]
+    refreshed = refresh_configured_test_tokens(target_users)
+    for refreshed_user, token in refreshed.items():
+        print(f"  Refreshed token for {refreshed_user} ({len(token)} chars)")
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="AI Customer Support Widget API Test Suite",
+        description="Project Template Backend API Test Suite",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -115,6 +126,8 @@ Examples:
     parser.add_argument('--token', type=str, help='JWT token to use for all test users')
     parser.add_argument('--token-user', choices=['primary', 'secondary', 'all'],
                         default='all', help='Which user to update with token (default: all)')
+    parser.add_argument('--refresh-tokens', action='store_true',
+                        help='Fetch fresh test JWTs via the internal shared-secret endpoint')
 
     args = parser.parse_args()
     print_banner()
@@ -130,6 +143,14 @@ Examples:
         if not success:
             print("\n  Failed to set provided token\n")
             return 1
+    elif args.refresh_tokens or test_config.can_auto_refresh_tokens():
+        try:
+            refresh_tokens_for_tests(args.token_user)
+        except Exception as exc:
+            if args.refresh_tokens:
+                print(f"\n  Failed to refresh tokens: {exc}\n")
+                return 1
+            print(f"  Token auto-refresh unavailable: {exc}")
 
     pytest_args = ['tests/usecases']
 

@@ -1,4 +1,3 @@
-import ast
 import concurrent.futures
 import json
 import re
@@ -6,7 +5,7 @@ import re
 from fastapi import HTTPException
 
 from config.settings import settings
-from ingestion.dtos.ingestion import Ingestion, SearchDTO, WebsiteScrapeResult
+from ingestion.dtos.ingestion import GeneratedIngestionRecord, Ingestion, SearchDTO, WebsiteScrapeResult
 from integrations.deepseek_client import deepseek_client
 from integrations.firecrawl_client import firecrawl_client
 from integrations.pinecone_client import pinecone_client
@@ -16,16 +15,19 @@ from utils.cache import get_cache_service
 
 
 class IngestionService:
+    def __init__(self):
+        self._ingestion_prompt = load_prompt("data-generation-for-ingestion")
+
     def scrape_websites(self, ingestion: Ingestion) -> dict:
         return firecrawl_client.batch_scrape_urls(
             ingestion.relevant_links_to_be_scraped,
             formats=["markdown"],
         )
 
-    def firecrawl_cleaner(self, ingestion: Ingestion, batch_scrape_result: any) -> list[WebsiteScrapeResult]:
+    def firecrawl_cleaner(self, ingestion: Ingestion, batch_scrape_result: dict) -> list[WebsiteScrapeResult]:
         cleaned_data = []
         data = batch_scrape_result.get("data", [])
-        for result, url in zip(data, ingestion.relevant_links_to_be_scraped):
+        for result in data:
             markdown = result.get("markdown")
             if not markdown:
                 continue
@@ -53,41 +55,49 @@ class IngestionService:
             )
         return cleaned_data
 
-    def generate_data_for_ingestion(self, list_of_data: list[WebsiteScrapeResult], ingestion: Ingestion):
-        generated_data = []
+    def _build_generation_prompt(self, item: WebsiteScrapeResult) -> str:
+        prompt = self._ingestion_prompt
+        prompt = prompt.replace("{markdown}", item.markdown or "")
+        prompt = prompt.replace("{description}", item.description)
+        prompt = prompt.replace("{title}", item.title)
+        prompt = prompt.replace("{url}", item.url or "")
+        return prompt
 
-        def process_data(item: WebsiteScrapeResult):
-            markdown = getattr(item, "markdown", None) or item.get("markdown")
-            description = getattr(item, "description", None) or item.get("description", "")
-            title = getattr(item, "title", None) or item.get("title", "")
-            url = getattr(item, "url", None) or item.get("url", "")
+    @staticmethod
+    def _strip_json_fence(content: str) -> str:
+        stripped = content.strip()
+        if stripped.startswith("```"):
+            return re.sub(r"^```[a-zA-Z]*\n|\n```$", "", stripped)
+        return stripped
 
-            prompt = load_prompt("data-generation-for-ingestion")
-            prompt = prompt.replace("{markdown}", markdown or "")
-            prompt = prompt.replace("{description}", description)
-            prompt = prompt.replace("{title}", title)
-            prompt = prompt.replace("{url}", url or "")
+    def _parse_generated_record(self, content: str, ingestion: Ingestion, url: str) -> GeneratedIngestionRecord | None:
+        cleaned_content = self._strip_json_fence(content)
+        try:
+            parsed = json.loads(cleaned_content)
+            parsed["source_url"] = url
+            parsed["company_name"] = ingestion.company_name
+            parsed["company_website"] = ingestion.company_website
+            return GeneratedIngestionRecord.model_validate(parsed)
+        except Exception as e:
+            print(f"[generate_data_for_ingestion] invalid generated payload for {url}: {e}")
+            return None
 
-            response = deepseek_client.generate_completion(prompt)
+    def generate_data_for_ingestion(self, list_of_data: list[WebsiteScrapeResult], ingestion: Ingestion) -> list[dict]:
+        def process_data(item: WebsiteScrapeResult) -> dict | None:
+            response = deepseek_client.generate_completion(self._build_generation_prompt(item))
             content_str = response.get("choices", [{}])[0].get("message", {}).get("content", "")
-            if content_str.strip().startswith("```"):
-                content_str = re.sub(r"^```[a-zA-Z]*\n|\n```$", "", content_str.strip())
+            record = self._parse_generated_record(content_str, ingestion, item.url)
+            if record is None:
+                return None
 
-            try:
-                parsed = json.loads(content_str)
-                parsed["source_url"] = url
-                parsed["company_name"] = ingestion.company_name
-                parsed["company_website"] = ingestion.company_website
-                parsed["specific_metadata"] = json.dumps(parsed["specific_metadata"])
-                return parsed
-            except json.JSONDecodeError as e:
-                print(f"[generate_data_for_ingestion] JSON decode error: {e}. Returning raw content.")
-                return content_str
+            serialized = record.model_dump()
+            serialized["specific_metadata"] = json.dumps(serialized["specific_metadata"])
+            return serialized
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        max_workers = min(4, max(1, len(list_of_data)))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             results = list(executor.map(process_data, list_of_data))
-        generated_data.extend(results)
-        return generated_data
+        return [result for result in results if result is not None]
 
     def ingest_data(self, ingestion: Ingestion):
         batch_scrape_result = self.scrape_websites(ingestion)
@@ -95,18 +105,21 @@ class IngestionService:
         generated_data = self.generate_data_for_ingestion(cleaned_data, ingestion)
         return self.embed_inputs(generated_data)
 
-    def embed_inputs(self, array_of_data: list[WebsiteScrapeResult]):
+    def embed_inputs(self, array_of_data: list[dict]) -> list[dict]:
         data_for_pinecone = []
         for data in array_of_data:
-            url = getattr(data, "source_url", None) or data.get("source_url")
-            title = getattr(data, "title", None) or data.get("title")
-            section = getattr(data, "section", None) or data.get("section")
-            content_type = getattr(data, "content_type", None) or data.get("content_type")
-            summarized_content = getattr(data, "summarized_content", None) or data.get("summarized_content")
+            url = data.get("source_url")
+            title = data.get("title")
+            section = data.get("section")
+            content_type = data.get("content_type")
+            summarized_content = data.get("summarized_content")
+            vector = self.embed_text(f"{title} {section} {content_type} {summarized_content}")
+            if not vector:
+                continue
             data_for_pinecone.append(
                 {
                     "id": url,
-                    "values": self.embed_text(f"{title} {section} {content_type} {summarized_content}"),
+                    "values": vector,
                     "metadata": data,
                 }
             )
@@ -123,6 +136,8 @@ class IngestionService:
 
     def scrape_and_ingest_data(self, ingestion: Ingestion):
         generated_data = self.ingest_data(ingestion)
+        if not generated_data:
+            raise HTTPException(status_code=422, detail="No valid ingestion records were generated")
         self.upsert_in_pinecone(generated_data)
         return generated_data
 
@@ -162,13 +177,12 @@ class IngestionService:
                     company_website=search_dto.company_website,
                 )
 
-            python_dict = ast.literal_eval(str(results))
             cache.set_json(
                 cache_key,
-                python_dict,
+                results,
                 ttl_seconds=settings.runtime.cache.search_ttl_seconds,
             )
-            return python_dict
+            return results
         except HTTPException:
             raise
         except Exception as e:

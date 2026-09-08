@@ -1,6 +1,6 @@
-# AI Customer Support Widget — API Testing Framework
+# Project Template Backend — API Testing Framework
 
-A pytest-based testing framework with JSON-driven test cases and module-based organization for the Embeddable AI Customer Support Widget backend.
+A pytest-based testing framework with JSON-driven test cases and module-based organization for the backend template.
 
 ## API Endpoints Covered
 
@@ -10,13 +10,13 @@ A pytest-based testing framework with JSON-driven test cases and module-based or
 | GET | `/sentry-debug` | health | None |
 | POST | `/google-login` | auth | None (Google credential in body) |
 | GET | `/verify-token` | auth | Bearer header |
-| POST | `/chatbot-response` | chatbot | JWT in body |
-| GET | `/all-chats` | chatbot | JWT in body |
-| POST | `/stats` | stats | JWT in body |
-| GET | `/stats` | stats | JWT in body |
+| POST | `/chatbot-response` | chatbot | Bearer header |
+| GET | `/all-chats` | chatbot | Bearer header |
+| POST | `/stats` | stats | Bearer header |
+| GET | `/stats` | stats | Bearer header |
 | PUT | `/ticket` | ticket | None |
 | GET | `/ticket/{uuid}` | ticket | None |
-| GET | `/tickets` | ticket | JWT in body |
+| GET | `/tickets` | ticket | Bearer header |
 | POST | `/ingestion/scrape-website` | ingestion | Bearer header |
 | GET | `/ingestion/search` | ingestion | Bearer header |
 
@@ -24,10 +24,10 @@ A pytest-based testing framework with JSON-driven test cases and module-based or
 
 ```bash
 # 1. Start the backend
-cd Backend/app && uvicorn app:app --port 8000 --reload
+cd Backend && ./run.sh
 
-# 2. Set auth token
-python tests/run_tests.py --token "YOUR_JWT_HERE"
+# 2. Refresh auth tokens
+python tests/run_tests.py --refresh-tokens
 
 # 3. Run all tests
 python tests/run_tests.py
@@ -93,17 +93,20 @@ from helpers.assertions import (
 | `TEST_MODE` | `local` | Test environment (local/staging/production) |
 | `RUN_SLOW_TESTS` | `true` | Whether to run slow tests |
 | `RUN_EXTERNAL_TESTS` | `false` | Whether to run tests hitting external services |
+| `TEST_AUTH_AUTO_REFRESH` | `false` | Auto-refresh persistent JWTs before tests |
+| `TEST_AUTH_SHARED_SECRET` | `` | Shared secret used to call the internal token issuer |
+| `TEST_AUTH_REFRESH_ENDPOINT` | `/internal/testing/issue-token` | Internal endpoint used for token refresh |
 
 ### Auth Token Setup
 
-Tests that require authentication need valid JWT tokens in `config/persistent-users.json`. To obtain tokens:
+Tests that require authentication can either use a manually pasted JWT or auto-refresh tokens through the internal test auth endpoint.
 
 1. Start the backend server
-2. Open the frontend and authenticate via Google OAuth
-3. Open browser DevTools > Application > Local Storage > `chatbotAuthToken`
-4. Copy the token and either:
-   - Paste into `persistent-users.json` under `users.primary.token`
-   - Or run: `python tests/run_tests.py --token "YOUR_TOKEN"`
+2. Set `ENABLE_INTERNAL_TEST_AUTH=true` and `INTERNAL_SERVICE_SECRET=...` in `Backend/.env`
+3. Set matching test env values: `TEST_AUTH_AUTO_REFRESH=true` and `TEST_AUTH_SHARED_SECRET=...`
+4. Run `python tests/run_tests.py --refresh-tokens`
+
+If you prefer manual setup, you can still paste a JWT into `persistent-users.json` or run `python tests/run_tests.py --token "YOUR_TOKEN"`.
 
 ## Debugging
 

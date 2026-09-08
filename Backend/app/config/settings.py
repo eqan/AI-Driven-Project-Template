@@ -97,6 +97,10 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str = "HS256"
     access_token_expire_days: int = 7
+    enable_internal_test_auth: bool = False
+    internal_service_secret: str = ""
+    internal_test_token_ttl_minutes: int = 120
+    internal_test_email_domain: str = "example.com"
     sentry_dsn: str = ""
     firecrawl_api_key: str = Field(default="", validation_alias="FIRECRAWL")
     voyage_api_key: str = ""

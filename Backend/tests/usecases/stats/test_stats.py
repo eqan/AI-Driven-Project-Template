@@ -94,7 +94,7 @@ def test_generate_stats_requires_auth(unauthenticated_client: APIClient):
     """POST /stats without auth token should fail."""
     response = unauthenticated_client.post("/stats", {})
     actual = response.get("_status_code")
-    assert actual in (400, 422, 429), f"Expected 400/422/429 without auth, got {actual}"
+    assert actual in (401, 429), f"Expected 401/429 without auth, got {actual}"
     print("  Generate stats auth requirement test passed")
 
 
@@ -104,7 +104,7 @@ def test_get_stats_requires_auth(unauthenticated_client: APIClient):
     """GET /stats without auth token should fail."""
     response = unauthenticated_client.get("/stats")
     actual = response.get("_status_code")
-    assert actual in (400, 422, 429), f"Expected 400/422/429 without auth, got {actual}"
+    assert actual in (401, 429), f"Expected 401/429 without auth, got {actual}"
     print("  Get stats auth requirement test passed")
 
 

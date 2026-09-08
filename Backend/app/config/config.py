@@ -51,7 +51,10 @@ engine = create_engine(
     },
 )
 
-Session = scoped_session(sessionmaker(bind=engine))
+# Keep loaded ORM attributes readable after session_scope() commits and removes
+# the scoped session. This avoids detached-instance errors in service flows that
+# return or inspect ORM objects outside the context manager.
+Session = scoped_session(sessionmaker(bind=engine, expire_on_commit=False))
 
 
 @lru_cache(maxsize=1)

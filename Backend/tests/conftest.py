@@ -1,6 +1,6 @@
 """
 Pytest Configuration and Fixtures
-Shared fixtures for AI Customer Support Widget tests
+Shared fixtures for backend template tests
 """
 
 import pytest
@@ -9,7 +9,11 @@ import os
 import logging
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+tests_root = Path(__file__).parent
+backend_root = tests_root.parent
+
+sys.path.insert(0, str(tests_root))
+sys.path.insert(0, str(backend_root))
 
 from tests.helpers.api_client import APIClient
 from tests.config.test_config import config
@@ -44,16 +48,16 @@ def secondary_user():
 def primary_token():
     try:
         return get_primary_user_token()
-    except ValueError:
-        pytest.skip("No primary user token configured in persistent-users.json")
+    except ValueError as exc:
+        pytest.skip(str(exc))
 
 
 @pytest.fixture(scope="session")
 def secondary_token():
     try:
         return get_secondary_user_token()
-    except ValueError:
-        pytest.skip("No secondary user token configured in persistent-users.json")
+    except ValueError as exc:
+        pytest.skip(str(exc))
 
 
 @pytest.fixture(scope="session")
@@ -155,11 +159,12 @@ def pytest_configure(config):
         auth_status = f"Failed to load: {e}"
 
     print("\n" + "=" * 80)
-    print("AI Customer Support Widget — Test Configuration")
+    print("Project Template Backend — Test Configuration")
     print(f"  API Base URL: {test_config.api_base_url}")
     print(f"  Test Mode: {test_config.test_mode}")
     print(f"  Run Slow Tests: {test_config.run_slow_tests}")
     print(f"  Run External Tests: {test_config.run_external_tests}")
+    print(f"  Auto Refresh Tokens: {test_config.can_auto_refresh_tokens()}")
     print(f"  Authentication: {auth_status}")
     print("=" * 80 + "\n")
 

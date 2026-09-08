@@ -76,7 +76,7 @@
         "use_auth": true
       },
       "expected": {
-        "status_code_in": [200, 401, 422, 500]
+        "status_code_in": [401, 422]
       },
       "assertions": {
         "type": "status_check"
@@ -126,7 +126,7 @@
     },
     {
       "name": "search_valid_query",
-      "description": "GET /ingestion/search with valid query (422 expected — endpoint requires body not query params)",
+      "description": "GET /ingestion/search with valid query params returns results or a graceful external-service failure",
       "input": {
         "method": "GET",
         "endpoint": "/ingestion/search",
