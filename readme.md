@@ -1,6 +1,6 @@
 # Project Template
 
-Backend-first template for fast interview execution, AI-assisted feature work, and predictable scaling. The goal is to keep the base predictable enough that new features can be added quickly without rethinking structure every time.
+Full-stack template for fast interview execution, AI-assisted feature work, and predictable scaling. The goal is to keep the base predictable enough that new features can be added quickly without rethinking structure every time.
 
 ## Direction
 
@@ -9,7 +9,7 @@ Backend-first template for fast interview execution, AI-assisted feature work, a
 - JSON-driven runtime defaults with `.env` overrides per environment
 - Cache-ready architecture with in-memory TTL now and Redis-ready abstraction
 - Internal test-token refresh flow for stable authenticated test runs
-- Static frontend is being replaced with a dynamic Next.js template
+- Dynamic Next.js frontend with HeroUI and App Router
 
 ## Current Structure
 
@@ -29,6 +29,13 @@ Backend-first template for fast interview execution, AI-assisted feature work, a
 │   ├── main.py
 │   ├── run.sh
 │   └── pyproject.toml
+├── frontend/
+│   ├── app/
+│   ├── components/
+│   ├── config/
+│   ├── styles/
+│   ├── ARCHITECTURE.md
+│   └── package.json
 └── readme.md
 ```
 
@@ -41,6 +48,15 @@ Backend-first template for fast interview execution, AI-assisted feature work, a
 - Optional integrations should degrade gracefully instead of crashing import-time startup.
 
 The main backend reference is [`Backend/ARCHITECTURE.md`](/Users/eqanahmad/Desktop/Project-Template/Backend/ARCHITECTURE.md:1), which is now kept diagram-first with Mermaid flows and minimal prose.
+
+## Frontend Principles
+
+- App Router pages should compose reusable sections instead of one-off layouts.
+- HeroUI provides the aesthetic base, while local components define project-specific patterns.
+- Frontend environment values belong in `frontend/.env.local`.
+- UI should stay aligned with backend DTOs and integration contracts.
+
+The main frontend reference is [`frontend/ARCHITECTURE.md`](/Users/eqanahmad/Desktop/Project-Template/frontend/ARCHITECTURE.md:1).
 
 ## Local Setup
 
@@ -110,6 +126,21 @@ To generate the SQL without applying it:
 ```bash
 cd Backend
 alembic upgrade head --sql
+```
+
+### 6. Run the frontend
+
+```bash
+cd frontend
+nvm use
+npm install
+npm run dev
+```
+
+Frontend environment baseline:
+
+```env
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
 ```
 
 ## Runtime Configuration
@@ -184,6 +215,6 @@ What they do:
 - `docs:mermaid:fix`: auto-fix common Mermaid syntax issues when possible
 - `docs:mermaid:render`: renders each Mermaid block through Mermaid CLI for a stricter final check
 
-## Planned Next Step
+## Current Frontend Status
 
-The old static frontend is being replaced by a dynamic Next.js template. The intention is to keep the same backend contract while making frontend composition, feature flags, and iteration speed much better during interviews and AI-assisted development.
+The project now includes a HeroUI-based Next.js frontend baseline designed to evolve into dashboards, product workflows, and backend-driven pages without changing the core structure again.

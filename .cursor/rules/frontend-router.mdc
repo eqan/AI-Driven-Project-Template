@@ -1,0 +1,28 @@
+---
+description: Route frontend work to the shared frontend instruction file and preserve the existing UI architecture and extension patterns
+globs:
+  - frontend/**/*.ts
+  - frontend/**/*.tsx
+  - frontend/**/*.css
+  - frontend/**/*.md
+  - frontend/.env.example
+alwaysApply: false
+---
+
+Use the full-stack parent instructions first, then the frontend child instructions whenever the task involves frontend code, styling, route composition, component design, frontend docs, or backend integration from the UI.
+
+For frontend feature requests, the parent instructions include a clarification-first workflow:
+
+- ask 3 important questions when the request is ambiguous
+- confirm route, interaction flow, and UI states before implementation
+- confirm or recommend API inputs and outputs when data is involved
+- reuse an existing section or component pattern when relevant
+- keep the visual language consistent
+- verify with lint, typecheck, and build
+
+For frontend documentation work, prefer Mermaid-first architecture docs with concise supporting text.
+
+Read and follow:
+
+@.cursor/fullstack-agentic-flow.md
+@.cursor/frontend-agentic-flow.md

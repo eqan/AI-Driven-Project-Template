@@ -1,0 +1,28 @@
+---
+description: Route feature work through the top-level full-stack instruction file before narrowing into backend or frontend execution
+globs:
+  - Backend/**
+  - frontend/**
+  - readme.md
+alwaysApply: true
+---
+
+Use the full-stack parent instructions first whenever a request may involve product behavior, feature development, API contracts, UI integration, or architecture decisions.
+
+Route the task into one of three paths:
+
+- backend-only
+- frontend-only
+- coordinated full-stack work
+
+For feature requests:
+
+- ask 3 important clarification questions when the request is ambiguous
+- confirm the user flow plus API inputs and outputs
+- reuse existing backend modules and frontend patterns when relevant
+- do backend contract work before frontend integration when both stacks change
+- verify both stacks before finishing
+
+Read and follow:
+
+@.cursor/fullstack-agentic-flow.md

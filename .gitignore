@@ -142,7 +142,6 @@ venv.bak/
 
 # Node-based docs tooling
 node_modules/
-package-lock.json
 
 # mypy
 .mypy_cache/

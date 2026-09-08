@@ -2,9 +2,9 @@
   "name": "project-template-doc-tools",
   "private": true,
   "scripts": {
-    "docs:mermaid:check": "npx -y @probelabs/maid Backend/ARCHITECTURE.md .cursor/backend-agentic-flow.md readme.md",
-    "docs:mermaid:fix": "npx -y @probelabs/maid --fix Backend/ARCHITECTURE.md .cursor/backend-agentic-flow.md readme.md",
-    "docs:mermaid:strict": "npx -y @probelabs/maid --strict Backend/ARCHITECTURE.md .cursor/backend-agentic-flow.md readme.md",
-    "docs:mermaid:render": "node ./scripts/render-mermaid-docs.mjs Backend/ARCHITECTURE.md .cursor/backend-agentic-flow.md readme.md"
+    "docs:mermaid:check": "npx -y @probelabs/maid Backend/ARCHITECTURE.md frontend/ARCHITECTURE.md .cursor/backend-agentic-flow.md .cursor/frontend-agentic-flow.md readme.md frontend/README.md",
+    "docs:mermaid:fix": "npx -y @probelabs/maid --fix Backend/ARCHITECTURE.md frontend/ARCHITECTURE.md .cursor/backend-agentic-flow.md .cursor/frontend-agentic-flow.md readme.md frontend/README.md",
+    "docs:mermaid:strict": "npx -y @probelabs/maid --strict Backend/ARCHITECTURE.md frontend/ARCHITECTURE.md .cursor/backend-agentic-flow.md .cursor/frontend-agentic-flow.md readme.md frontend/README.md",
+    "docs:mermaid:render": "node ./scripts/render-mermaid-docs.mjs Backend/ARCHITECTURE.md frontend/ARCHITECTURE.md .cursor/backend-agentic-flow.md .cursor/frontend-agentic-flow.md readme.md frontend/README.md"
   }
 }

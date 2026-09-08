@@ -1,6 +1,8 @@
 # Backend Agentic Flow
 
-Use this file as the parent instruction set for any backend feature, bugfix, refactor, infra change, or backend-facing documentation update.
+Use this file as the backend child instruction set for any backend feature, bugfix, refactor, infra change, or backend-facing documentation update after task routing has been decided.
+
+Read `.cursor/fullstack-agentic-flow.md` first when the request may involve both backend and frontend changes.
 
 ## Mission
 

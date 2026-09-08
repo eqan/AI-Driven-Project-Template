@@ -10,7 +10,7 @@ globs:
 alwaysApply: false
 ---
 
-Use the backend parent instructions whenever the task involves backend code, tests, runtime configuration, backend docs, or architecture decisions.
+Use the full-stack parent instructions first, then the backend child instructions whenever the task involves backend code, tests, runtime configuration, backend docs, or architecture decisions.
 
 For backend feature requests, the parent instructions include a mandatory clarification-first workflow:
 
@@ -26,4 +26,5 @@ For backend documentation work, prefer Mermaid-first architecture docs with conc
 
 Read and follow:
 
+@.cursor/fullstack-agentic-flow.md
 @.cursor/backend-agentic-flow.md

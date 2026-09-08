@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+	--font-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+	--font-mono: "SF Mono", "IBM Plex Mono", "Menlo", monospace;
+}
+
+:root {
+  --background: #f6f4ee;
+  --foreground: #101219;
+  --muted: #5d6473;
+  --accent: #2d56ff;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #f8fafc;
+  --muted: #9aa4b2;
+  --accent: #8bb2ff;
+}
+
+html {
+  background:
+    radial-gradient(circle at top, rgba(117, 157, 255, 0.16), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.38), transparent 42%),
+    var(--background);
+}
+
+body {
+  background: transparent;
+  color: var(--foreground);
+}
