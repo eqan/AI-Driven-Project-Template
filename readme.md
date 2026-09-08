@@ -40,7 +40,7 @@ Backend-first template for fast interview execution, AI-assisted feature work, a
 - Environment-specific values come from `Backend/.env`.
 - Optional integrations should degrade gracefully instead of crashing import-time startup.
 
-More detail lives in [`Backend/ARCHITECTURE.md`](/Users/eqanahmad/Desktop/Project-Template/Backend/ARCHITECTURE.md:1).
+The main backend reference is [`Backend/ARCHITECTURE.md`](/Users/eqanahmad/Desktop/Project-Template/Backend/ARCHITECTURE.md:1), which is now kept diagram-first with Mermaid flows and minimal prose.
 
 ## Local Setup
 
@@ -167,6 +167,22 @@ If you prefer manual token injection:
 cd Backend
 python tests/run_tests.py --token "YOUR_JWT_HERE"
 ```
+
+## Mermaid Doc Validation
+
+Use these commands from the repo root to validate architecture diagrams:
+
+```bash
+npm run docs:mermaid:check
+npm run docs:mermaid:fix
+npm run docs:mermaid:render
+```
+
+What they do:
+
+- `docs:mermaid:check`: fast Mermaid lint/validation for markdown files
+- `docs:mermaid:fix`: auto-fix common Mermaid syntax issues when possible
+- `docs:mermaid:render`: renders each Mermaid block through Mermaid CLI for a stricter final check
 
 ## Planned Next Step
 

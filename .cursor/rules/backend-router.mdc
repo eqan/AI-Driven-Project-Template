@@ -12,6 +12,18 @@ alwaysApply: false
 
 Use the backend parent instructions whenever the task involves backend code, tests, runtime configuration, backend docs, or architecture decisions.
 
+For backend feature requests, the parent instructions include a mandatory clarification-first workflow:
+
+- ask 3 important questions when the request is ambiguous
+- confirm or recommend API inputs and outputs before implementation
+- reuse an existing module/use case when relevant
+- implement with strict DTOs, services, and thin controllers
+- optimize with shared concerns like caching and rate limiting when relevant
+- add tests under `Backend/tests/`
+- document the feature in the same use-case area when possible
+
+For backend documentation work, prefer Mermaid-first architecture docs with concise supporting text.
+
 Read and follow:
 
 @.cursor/backend-agentic-flow.md

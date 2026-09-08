@@ -27,6 +27,21 @@ Before editing backend behavior, read these files:
 
 When changing a specific domain, also read its controller, service, DTOs, models, and tests.
 
+## Documentation Style
+
+Backend documentation should be architecture-first and Mermaid-first.
+
+Rules:
+
+- prefer Mermaid diagrams over long prose explanations
+- keep text short and directive
+- use flowcharts for system boundaries and request flow
+- use sequence diagrams for runtime interactions
+- use decision-style diagrams when feature flags or fallbacks matter
+- document the real implemented flow, not an aspirational one
+- show where DTOs, controllers, services, models, cache, and tests fit
+- update diagrams in the same task when the structure or flow changes
+
 ## Backend Structure
 
 The backend is organized by domain under `Backend/app/`:
@@ -79,16 +94,41 @@ When changing startup behavior:
 
 When asked to add a backend feature:
 
-1. Identify the domain.
-2. Read the existing flow in that domain before editing.
-3. Extend DTOs and response contracts first.
-4. Update persistence shape if required.
-5. Implement business logic in the service layer.
-6. Keep controllers thin and delegate to services.
-7. Add tests.
-8. Update docs and examples if setup or behavior changed.
+1. Ask exactly 3 important clarification questions before implementation when the feature request is not fully specified.
+2. After those 3 questions, ask for or confirm the API inputs and desired outputs.
+3. When helpful, recommend a request/response shape so the user can quickly choose the intended API flow.
+4. Identify the most relevant existing domain or use case.
+5. Reuse an existing module when it already fits the concept well enough.
+6. Create a new domain or use case only when the feature is meaningfully separate.
+7. Read the existing flow in the chosen domain before editing.
+8. Define strict DTOs and response contracts first.
+9. Update persistence shape and Alembic migration if required.
+10. Implement business logic in the service layer.
+11. Keep controllers thin and delegate to services.
+12. Add shared concerns such as caching, rate limiting, feature flags, or runtime config when relevant.
+13. Add tests under `Backend/tests/`.
+14. Document the feature in the same use-case area whenever possible, using Mermaid diagrams as the primary format.
+15. Update shared docs if behavior, setup, or architecture changed.
 
 Create a new domain only when the concept is truly separate from existing ones.
+
+### Clarification Gate
+
+For user-requested backend features, the preferred sequence is:
+
+1. Ask 3 high-signal questions that remove ambiguity.
+2. Confirm the API contract by asking for:
+   - inputs
+   - desired outputs
+   - success and failure behavior
+3. If the user is unsure, propose a recommended API flow with concrete request and response examples.
+4. Only then implement the feature.
+
+The 3 questions should usually cover:
+
+- the exact user or system behavior desired
+- the API contract shape
+- important constraints such as auth, persistence, background work, caching, or integration needs
 
 ## Controller Rules
 
@@ -191,6 +231,7 @@ Rules:
 
 - define request/response DTOs in `<domain>/dtos/`
 - validate input constraints in Pydantic models
+- keep DTOs strict rather than permissive
 - keep payload names stable once introduced
 - return structured responses that are easy for frontend and AI tooling to consume
 
@@ -209,11 +250,17 @@ Patterns:
 - use Python tests for multi-step flows, SSE, auth, and edge cases
 - if adding a route, add at least one success-path and one failure-path test
 - if changing a shared contract, update all affected tests
+- prefer documenting the feature in the same use-case folder after tests are added
 
 Test locations:
 
 - `Backend/tests/usecases/<domain>/`
 - `Backend/tests/helpers/`
+
+Documentation location preference:
+
+- first choice: the same use-case folder in `Backend/tests/usecases/<domain>/`
+- second choice: shared docs such as `Backend/tests/README.md`, `Backend/ARCHITECTURE.md`, or `readme.md`
 
 ## Documentation Rules
 
@@ -225,6 +272,8 @@ When backend behavior changes, update the relevant docs in the same task:
 - `Backend/.env.example`
 
 The repo should always read like a current template, not an outdated demo artifact.
+
+Documentation should majorly comprise Mermaid diagrams and flow visuals, with minimal supporting text.
 
 ## Preferred Vs Legacy Patterns
 
@@ -251,10 +300,16 @@ Avoid expanding these unless intentionally refactoring them:
 
 Before finishing backend work, verify:
 
+- 3 clarification questions were asked when the feature was ambiguous
+- API inputs and desired outputs were confirmed or explicitly recommended
+- an existing domain/module was reused when relevant
 - imports still resolve
 - settings are typed and documented
+- DTOs are strict
 - routes remain thin
 - services own the logic
+- caching/rate limiting/runtime settings were considered where relevant
 - tests cover the change
-- docs are aligned
+- docs are aligned, including same-folder use-case documentation when appropriate
+- Mermaid diagrams were updated when architecture, runtime flow, or request flow changed
 - no secrets were added to tracked example files
