@@ -25,7 +25,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from tests.config.test_config import config as test_config
-from tests.helpers.auth_helper import refresh_configured_test_tokens
+from tests.helpers.auth_helper import PERSISTENT_USERS_FILE, refresh_configured_test_tokens
 
 
 def print_banner():
@@ -136,7 +136,7 @@ Examples:
         list_markers()
         return 0
 
-    config_file = Path(__file__).parent / 'config' / 'persistent-users.json'
+    config_file = PERSISTENT_USERS_FILE
 
     if args.token:
         success = use_provided_token(config_file, args.token, args.token_user)

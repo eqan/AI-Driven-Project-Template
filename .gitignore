@@ -165,4 +165,6 @@ cython_debug/
 # Random
 .DS_Store
 **/.DS_Store
-Frontend/index.html
+
+Backend/tests/config/persistent-users.local.json
+Backend/tests/config/*.backup

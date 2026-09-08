@@ -4,6 +4,7 @@ Provides utilities for JWT token management, refresh, and authenticated requests
 """
 import json
 import os
+import shutil
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, Optional
@@ -15,12 +16,15 @@ from pydantic import EmailStr, TypeAdapter, ValidationError
 
 from tests.config.test_config import config
 
-PERSISTENT_USERS_FILE = Path(__file__).parent.parent / "config" / "persistent-users.json"
+TEST_CONFIG_DIR = Path(__file__).parent.parent / "config"
+PERSISTENT_USERS_TEMPLATE_FILE = TEST_CONFIG_DIR / "persistent-users.json"
+PERSISTENT_USERS_FILE = TEST_CONFIG_DIR / "persistent-users.local.json"
 INTERNAL_AUTH_HEADER = "X-Internal-Service-Secret"
 EMAIL_ADAPTER = TypeAdapter(EmailStr)
 
 
 def load_persistent_users() -> Dict:
+    ensure_local_persistent_users_file()
     if not PERSISTENT_USERS_FILE.exists():
         raise FileNotFoundError(f"Persistent users file not found: {PERSISTENT_USERS_FILE}")
     with open(PERSISTENT_USERS_FILE, 'r') as f:
@@ -28,8 +32,17 @@ def load_persistent_users() -> Dict:
 
 
 def save_persistent_users(users_config: Dict) -> None:
+    ensure_local_persistent_users_file()
     with open(PERSISTENT_USERS_FILE, 'w') as f:
         json.dump(users_config, f, indent=2)
+
+
+def ensure_local_persistent_users_file() -> None:
+    if PERSISTENT_USERS_FILE.exists():
+        return
+
+    if PERSISTENT_USERS_TEMPLATE_FILE.exists():
+        shutil.copyfile(PERSISTENT_USERS_TEMPLATE_FILE, PERSISTENT_USERS_FILE)
 
 
 def get_test_user(user_type: str = "primary") -> Dict:

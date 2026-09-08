@@ -6,16 +6,16 @@
     "primary": {
       "full_name": "Test Primary User",
       "email": "qa.primary@example.com",
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpbnRlcm5hbC10ZXN0LXByaW1hcnkiLCJlbWFpbCI6InFhLnByaW1hcnlAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBQcmltYXJ5IFVzZXIiLCJwaWN0dXJlIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS9wcm9maWxlcy9wcmltYXJ5IiwiZXhwIjoxNzg4OTA0NjMwfQ.Dtb6yfBVZQFrPfCttAM0Dm_7Opsq1TKqNPPqJMCNbfY",
+      "token": "",
       "description": "Primary test user for most test modules"
     },
     "secondary": {
       "full_name": "Test Secondary User",
       "email": "qa.secondary@example.com",
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpbnRlcm5hbC10ZXN0LXNlY29uZGFyeSIsImVtYWlsIjoicWEuc2Vjb25kYXJ5QGV4YW1wbGUuY29tIiwibmFtZSI6IlRlc3QgU2Vjb25kYXJ5IFVzZXIiLCJwaWN0dXJlIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS9wcm9maWxlcy9zZWNvbmRhcnkiLCJleHAiOjE3ODg5MDQ2MzB9.PwGSU_BXkYANVfBf9plnlGdQsIGWCQkSlPUsRXPvdh8",
+      "token": "",
       "description": "Secondary test user for multi-user scenarios"
     }
   },
-  "lastUpdated": "2026-09-08T19:57:10.390034+00:00",
-  "setupComplete": true
+  "lastUpdated": "",
+  "setupComplete": false
 }
