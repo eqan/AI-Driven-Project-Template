@@ -1,6 +1,6 @@
 # Project Template
 
-Backend-first template for fast interview execution, AI-assisted feature work, and predictable scaling. The goal is to keep the base clean enough that new features can be added quickly without rethinking structure every time.
+Backend-first template for fast interview execution, AI-assisted feature work, and predictable scaling. The goal is to keep the base predictable enough that new features can be added quickly without rethinking structure every time.
 
 ## Direction
 
@@ -8,6 +8,7 @@ Backend-first template for fast interview execution, AI-assisted feature work, a
 - PostgreSQL as the default relational store
 - JSON-driven runtime defaults with `.env` overrides per environment
 - Cache-ready architecture with in-memory TTL now and Redis-ready abstraction
+- Internal test-token refresh flow for stable authenticated test runs
 - Static frontend is being replaced with a dynamic Next.js template
 
 ## Current Structure
@@ -52,7 +53,7 @@ uv sync
 
 ### 2. Configure environment
 
-Copy `Backend/.env.example` to `Backend/.env` and fill in the values you need.
+Copy `Backend/.env.example` to `Backend/.env` and fill in the values you need for your environment.
 
 Important fields:
 
@@ -61,12 +62,16 @@ HOST=0.0.0.0
 PORT=8000
 RELOAD=false
 WORKERS=4
-DB_USER=eqanahmad
-DB_PASSWORD=123
+DB_USER=postgres
+DB_PASSWORD=change-me
 DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_NAME=interfaze
 SECRET_KEY=replace-me
+ENABLE_INTERNAL_TEST_AUTH=true
+INTERNAL_SERVICE_SECRET=replace-with-a-shared-secret
+TEST_AUTH_AUTO_REFRESH=true
+TEST_AUTH_SHARED_SECRET=replace-with-the-same-secret
 ```
 
 ### 3. Start PostgreSQL
@@ -108,14 +113,44 @@ In practice:
 - `runtime.json` is the template baseline
 - `.env` is the environment override layer
 
+Use `.env` for values that change by environment, especially:
+
+- secrets
+- database credentials
+- provider API keys
+- internal test auth settings
+
+Use `runtime.json` for reusable defaults, especially:
+
+- feature flags
+- rate limits
+- cache defaults
+- server defaults
+- AI defaults
+
 ## Testing
 
 ```bash
 cd Backend
-uv run pytest tests/ -v -s
+python tests/run_tests.py --refresh-tokens
+python tests/run_tests.py
 ```
 
-The test suite is organized by use case and leans on JSON-driven cases so patterns are easy to reproduce.
+The test suite is organized by use case and leans on JSON-driven cases so patterns are easy to reproduce. Authenticated tests can auto-refresh JWTs through the internal shared-secret route instead of relying on manual token copy-paste.
+
+If you only want to refresh tokens:
+
+```bash
+cd Backend
+python tests/run_tests.py --refresh-tokens
+```
+
+If you prefer manual token injection:
+
+```bash
+cd Backend
+python tests/run_tests.py --token "YOUR_JWT_HERE"
+```
 
 ## Planned Next Step
 
