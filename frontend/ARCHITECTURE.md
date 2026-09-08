@@ -40,6 +40,7 @@ flowchart TD
     Frontend --> Docs
 
     App --> Home[page.tsx]
+    App --> Auth[auth/page.tsx]
     App --> Architecture[architecture/page.tsx]
     App --> Playbook[playbook/page.tsx]
     App --> BackendApi[backend-api/page.tsx]
@@ -105,14 +106,48 @@ flowchart LR
 flowchart TD
     Env[".env.local"]
     PublicVar["NEXT_PUBLIC_API_BASE_URL"]
-    ApiClient[Future typed API client]
+    GoogleClient["NEXT_PUBLIC_GOOGLE_CLIENT_ID"]
+    ApiClient[Typed auth/API layer]
+    Middleware[Next middleware auth gate]
+    Provider[Auth provider]
     Pages[Route pages]
     Backend[FastAPI backend]
 
     Env --> PublicVar
+    Env --> GoogleClient
     PublicVar --> ApiClient
-    Pages --> ApiClient
+    GoogleClient --> Pages
+    Middleware --> Pages
+    Pages --> Provider
+    Provider --> ApiClient
     ApiClient --> Backend
+```
+
+## Auth Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant M as Next middleware
+    participant A as /auth route
+    participant G as Google Identity Services
+    participant P as Auth provider
+    participant B as FastAPI backend
+
+    U->>M: Request protected route
+    alt No auth cookie
+        M-->>A: Redirect to /auth
+        A->>G: Render Google sign-in button
+        G-->>A: id_token credential
+        A->>B: POST /google-login
+        B-->>A: Project JWT + user info
+        A->>P: Persist session
+    else Auth cookie present
+        M-->>P: Allow route render
+    end
+    P->>B: GET /verify-token
+    B-->>P: Verified JWT payload
+    P-->>U: Protected UI
 ```
 
 ## Feature Workflow

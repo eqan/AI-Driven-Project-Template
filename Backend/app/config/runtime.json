@@ -12,8 +12,12 @@
     ],
     "allow_credentials": true,
     "allow_methods": [
+      "OPTIONS",
       "GET",
-      "POST"
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE"
     ],
     "allow_headers": [
       "*"

@@ -65,6 +65,8 @@ If the user does not know the exact API shape, recommend one before implementati
 - keep backend business logic in services
 - keep frontend presentation logic in reusable sections
 - keep integration boundaries explicit between the two stacks
+- for time-boxed app work, avoid placeholder marketing copy and verbose explanatory UI
+- when frontend work is involved, prefer practical product UX over decorative layout filler
 
 ## Handoff To Child Flows
 
@@ -80,5 +82,11 @@ Before finishing a feature:
 
 - backend tests and runtime checks should pass unless blocked
 - frontend lint, typecheck, and build should pass unless blocked
+- frontend output should be visually reviewed for hierarchy, spacing, theme alignment, and state completeness
 - shared docs should reflect the implemented flow
 - Mermaid diagrams should be updated when architecture or request flow changed
+
+## Response Rules
+
+- keep updates and final summaries concise
+- avoid spending tokens on long explanations unless the user asks for depth

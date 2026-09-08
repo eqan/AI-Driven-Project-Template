@@ -33,7 +33,12 @@ Copy `.env.example` to `.env.local`:
 
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
 ```
+
+The frontend now protects the app behind Google sign-in. `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
+must match the Google Identity Services web client configured for the same origins as
+the frontend app.
 
 ## Commands
 

@@ -18,6 +18,10 @@ For frontend feature requests, the parent instructions include a clarification-f
 - confirm or recommend API inputs and outputs when data is involved
 - reuse an existing section or component pattern when relevant
 - keep the visual language consistent
+- design pages like real product UI, not filler-heavy showcase screens
+- keep copy brief and useful
+- visually integrate third-party controls into the surrounding theme
+- self-review hierarchy, spacing, states, and mobile fit before finishing
 - verify with lint, typecheck, and build
 
 For frontend documentation work, prefer Mermaid-first architecture docs with concise supporting text.

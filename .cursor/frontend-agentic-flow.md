@@ -76,8 +76,58 @@ If the user is unsure, recommend a concrete screen structure and request/respons
 - preserve one coherent visual language
 - prefer reusable sections over one-off layouts
 - avoid generic template filler once the project direction is known
+- for time-boxed product work, avoid marketing copy, explanatory panels, and oversized placeholder content
+- prefer minimal task-focused screens that help the user complete the next action fast
+- design like a product designer shipping a real app, not a landing-page generator filling empty space
+- every screen should have a clear primary action, readable hierarchy, and a reason for each block on the page
+- use text sparingly and intentionally; if a paragraph does not help the user decide or act, cut it
+- align third-party widgets and embedded controls with the surrounding theme using spacing, framing, contrast, and supporting layout
+- prefer strong structure over decorative effects; blur, gradients, and glass should support hierarchy, not replace it
+- keep spacing consistent across sections, cards, forms, and actions
+- make forms and task flows feel practical: clear labels, obvious next step, short helper text, visible feedback
+- prioritize scanability: headings, labels, actions, and key values should be legible within a quick glance
+- avoid large dead zones, stretched copy blocks, or cards that exist only to balance composition
+- avoid adding UI elements only because the layout feels empty
 - keep mobile and desktop layouts intentional
 - use HeroUI and local composition, not random dependency sprawl
+
+## UX Rules
+
+- start from the user task, then choose the smallest UI that supports it well
+- keep the happy path obvious and reduce competing actions
+- error, loading, empty, and success states should feel designed, not appended at the end
+- preserve accessibility basics: contrast, button clarity, focusability, and sensible semantics
+- prefer familiar interaction patterns for auth, forms, dashboards, and CRUD unless the user asks for something novel
+- if a component looks visually imported from another system, restyle the surrounding container so it feels integrated
+
+## Copy Rules
+
+- avoid filler copy, product-speak, and generic motivational text
+- keep headings short and specific
+- keep supporting text to one or two useful sentences when possible
+- do not explain implementation details in the UI unless the user needs that information to make a decision
+- prefer labels and helper text that clarify action, input, or consequence
+
+## Visual Review
+
+Before finishing a frontend change, inspect the output and ask:
+
+- does the page look like one coherent product instead of assembled demo blocks
+- is there a strong focal point and a clear next action
+- is any text present only to occupy space
+- do embedded controls, forms, and widgets visually belong inside the current theme
+- are spacing, corner radii, borders, and shadows consistent enough to feel intentional
+- does mobile still feel designed, not merely stacked
+- are loading, error, empty, and success states visually aligned with the main experience
+- is there any section or card that can be removed without hurting usability
+
+If any answer is weak, revise before finishing.
+
+## Response Rules
+
+- keep implementation summaries short by default
+- report what changed, what was verified, and any blocker
+- avoid long frontend explanations unless the user explicitly asks for them
 
 ## Data And Integration Rules
 
@@ -94,5 +144,8 @@ Before finishing frontend work, verify:
 - route and state flow are clear
 - an existing component pattern was reused when relevant
 - new UI works on mobile and desktop
+- the screen passes the Visual Review section above
+- copy is concise and task-focused
+- components align with the established theme and spacing system
 - docs are aligned
 - lint, typecheck, and build pass unless blocked
