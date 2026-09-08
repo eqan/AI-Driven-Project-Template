@@ -8,6 +8,7 @@ Read `.cursor/fullstack-agentic-flow.md` first when the request may involve both
 
 This frontend should stay:
 
+- shaped like a real SaaS product, not a demo or landing page
 - visually strong out of the box
 - easy to extend under interview pressure
 - obvious for AI tools to read and continue
@@ -61,6 +62,38 @@ When asked to add a frontend feature:
 9. Update docs when structure, patterns, or flows change.
 10. Verify with `npm run lint`, `npm run typecheck`, and `npm run build`.
 
+## Project Fit Check
+
+Before designing or changing UI:
+
+- scan the existing routes, components, tokens, styles, docs, and tests first
+- detect the framework, styling system, and component patterns before inventing new primitives
+- follow the repo's current conventions for copy, icons, accessibility, and responsiveness
+- if design-system rules are missing, infer from the current product surface and keep the inference consistent
+- merge any route-specific checklist with these rules instead of replacing it
+
+## Core Stance
+
+- design flows before screens
+- build usable product UI, not decorative shells
+- solve both the happy path and the state path
+- use visual polish in service of clarity, trust, and speed
+- treat mobile as its own product constraint, not a desktop layout squeezed smaller
+- treat UI copy as product behavior
+- commit to an intentional aesthetic direction before styling a new surface
+- make interfaces memorable through precision and context-fit, not random novelty
+
+## Design Thinking
+
+Before coding a new page or major component, decide:
+
+- purpose: what user problem this surface solves
+- tone: the visual character that fits the product and feature
+- constraints: framework, performance, accessibility, responsiveness, and existing system rules
+- differentiation: what makes the surface feel intentionally designed rather than templated
+
+Choose one direction and execute it consistently.
+
 ## Clarification Gate
 
 The 3 questions should usually cover:
@@ -76,6 +109,7 @@ If the user is unsure, recommend a concrete screen structure and request/respons
 - preserve one coherent visual language
 - prefer reusable sections over one-off layouts
 - avoid generic template filler once the project direction is known
+- treat this repository as a SaaS application workspace by default, even when the content is still sparse
 - for time-boxed product work, avoid marketing copy, explanatory panels, and oversized placeholder content
 - prefer minimal task-focused screens that help the user complete the next action fast
 - design like a product designer shipping a real app, not a landing-page generator filling empty space
@@ -91,6 +125,16 @@ If the user is unsure, recommend a concrete screen structure and request/respons
 - keep mobile and desktop layouts intentional
 - use HeroUI and local composition, not random dependency sprawl
 
+## Auth Route Rules
+
+- treat login, sign-up, reset, and access-gate routes as utility screens first
+- keep auth pages calmer and smaller than in-app workspace surfaces
+- use one clear headline, one short supporting explanation, and one obvious primary action
+- do not add feature grids, benefit cards, testimonial-style copy, or narrative hero sections to a simple auth route unless the user explicitly asks for them
+- if the layout feels too empty, prefer whitespace and stronger hierarchy over adding promotional filler
+- third-party auth controls should sit in restrained product chrome so the provider widget feels integrated without competing with the page
+- keep auth copy focused on access, verification, return path, and recovery
+
 ## UX Rules
 
 - start from the user task, then choose the smallest UI that supports it well
@@ -99,6 +143,43 @@ If the user is unsure, recommend a concrete screen structure and request/respons
 - preserve accessibility basics: contrast, button clarity, focusability, and sensible semantics
 - prefer familiar interaction patterns for auth, forms, dashboards, and CRUD unless the user asks for something novel
 - if a component looks visually imported from another system, restyle the surrounding container so it feels integrated
+- keep domain policy, authorization decisions, and durable workflow state out of presentation components
+- keep local interaction state, immediate feedback, and accessibility behavior in the UI layer
+- challenge the surface against slow networks, awkward data, repeated actions, and narrow devices when plausible
+
+## Experience Contract
+
+Every flow should clearly include:
+
+- entry point
+- user intent and current context
+- primary action
+- immediate feedback
+- outcome
+- natural next step or exit
+
+Pattern defaults:
+
+- use hub-and-spoke for dashboards and detail views
+- use linear flows for onboarding, setup, and forms
+- use tabs only for a few stable top-level areas
+- use progressive disclosure when showing everything at once would overload the screen
+
+## Visual Direction
+
+- default product surfaces should feel calm, utilitarian, and high-craft
+- favor crisp hierarchy, restrained color, clear affordances, stable layout dimensions, and strong contrast
+- use tokens for color, spacing, radius, and motion
+- avoid decoration without function
+- choose typography deliberately; pair expressive display choices with readable body text when the product allows it
+- avoid generic default font choices and repeated one-size-fits-all aesthetic habits
+- use dominant colors with controlled accents instead of timid evenly-weighted palettes
+- use motion sparingly but intentionally for high-impact moments and feedback
+- prefer asymmetry, overlap, density control, or negative space only when they improve hierarchy and memorability
+- create atmosphere with backgrounds, texture, borders, or depth only when they reinforce the chosen direction
+- avoid generic centered hero layouts when a real product screen is needed
+- avoid nested cards and repeated equal-width marketing-card grids as a default pattern
+- avoid stock-looking AI visuals or gradients used only to signal "AI"
 
 ## Copy Rules
 
@@ -107,6 +188,36 @@ If the user is unsure, recommend a concrete screen structure and request/respons
 - keep supporting text to one or two useful sentences when possible
 - do not explain implementation details in the UI unless the user needs that information to make a decision
 - prefer labels and helper text that clarify action, input, or consequence
+- name actions specifically instead of using generic labels when possible
+- do not expose raw provider errors, stack traces, or internal jargon in user-facing copy
+- blame the system, not the user, when recovery is possible
+
+## State Discipline
+
+Every async or data-dependent surface needs:
+
+- loading states that resemble the final layout
+- empty states with context and a next step
+- error states with plain-language recovery
+- success states with lightweight confirmation
+
+Do not ship a polished happy path with silent failure everywhere else.
+
+## Mobile Rules
+
+- minimum touch target should be 44px
+- avoid horizontal overflow at 320px to 375px widths
+- do not rely on hover for critical actions
+- reserve space for async content to reduce layout jumps
+- keep primary actions reachable and forms compact
+- consider safe areas for sticky controls
+
+## AI Surface Rules
+
+- make uncertainty visible when an AI feature is actually uncertain
+- preserve review, undo, reject, or edit paths when AI output affects trust
+- do not fake progress, confidence, or provenance
+- keep AI chrome secondary to the user's main task
 
 ## Visual Review
 
@@ -120,8 +231,23 @@ Before finishing a frontend change, inspect the output and ask:
 - does mobile still feel designed, not merely stacked
 - are loading, error, empty, and success states visually aligned with the main experience
 - is there any section or card that can be removed without hurting usability
+- does the flow have a clean exit and recovery path
+- are focus, semantics, contrast, and keyboard access still sound
+- is every dependency and visual flourish justified
 
 If any answer is weak, revise before finishing.
+
+## Red Flags
+
+Stop and revise when you see:
+
+- happy-path-only UI
+- generic or hidden error handling
+- hardcoded colors where tokens should exist
+- hover-only critical actions
+- third-party widgets dropped into the page without visual integration
+- oversized copy blocks explaining obvious controls
+- animation that slows task completion
 
 ## Response Rules
 
@@ -135,6 +261,51 @@ If any answer is weak, revise before finishing.
 - centralize future API access in a dedicated typed layer
 - use `.env.local` for environment-specific frontend settings
 - keep frontend shapes aligned with backend DTOs
+- validate public runtime values early and fail loudly on unsafe API origins or malformed config
+- do not persist bearer tokens, refresh tokens, or other secrets in `localStorage` or `sessionStorage` unless the user explicitly accepts that tradeoff
+- treat browser-readable cookies as a weaker baseline than `HttpOnly` backend-managed session cookies
+- prefer one source of truth for auth persistence instead of duplicating session data across cookies, storage, and in-memory state
+- assume any user-scoped payload can become sensitive once auth, billing, support, or admin features arrive
+
+## Security Baseline
+
+- choose the safest default before adding convenience behavior
+- keep tokens, permissions, and durable auth state out of presentation components
+- sanitize redirect targets and distrust all return URLs, query params, and provider callback state
+- reject malformed or obviously expired auth artifacts before letting the UI treat them as valid
+- prefer secure transport assumptions: production API origins should be `https`
+- add low-risk response headers when the frontend owns the shell: CSP, frame protections, referrer policy, permissions policy, and content-type protections
+- do not expose internal error objects directly to users; map them to short recovery-oriented copy
+- challenge every new script, iframe, widget, and remote image against privacy, referrer leakage, and theme fit
+
+## Caching And Freshness
+
+- decide cache strategy from data sensitivity and freshness needs before writing fetch code
+- use `no-store` for auth, session verification, permissions, billing, admin data, one-time tokens, and anything that can become stale or unsafe if replayed
+- prefer server or framework cache controls over ad hoc browser storage when the data is not user-authored
+- do not cache personalized API payloads in shared browser storage by default
+- use browser storage for drafts, dismissed UI state, recent filters, and other non-secret convenience state only when that persistence helps the user
+- document the freshness expectation when adding a new data surface: live, near-live, session-sticky, or static
+- if the user does not need instant freshness, define an intentional revalidation trigger instead of fetching on every render
+
+## Browser Caching Scenarios
+
+- auth verification, current user, permissions, billing balance, usage quotas:
+  use `no-store`; stale values can cause security, trust, or entitlement bugs
+- dashboard metrics that should refresh when returning to the page but do not need per-click refetching:
+  use a short-lived cache or revalidation trigger on focus/navigation instead of permanent browser storage
+- public reference data such as plans, feature descriptions, static docs, or release notes:
+  allow framework or browser caching with explicit revalidation because the data is not user-specific
+- form drafts, unsent comments, wizard progress, and table filters:
+  browser storage is reasonable if the payload is non-secret and the user benefits from resuming work
+- search suggestions and frequently reused lookups:
+  use in-memory or short-lived cache keyed by query; avoid long-lived persistence unless it materially improves UX
+- avatars, logos, and public media:
+  let the browser cache the asset, but prefer privacy-safe loading and avoid leaking referrers where possible
+- admin screens, support tooling, impersonation flows, and anything that changes authorization context:
+  bypass browser caching and clear derived client state aggressively on sign-out or role change
+- optimistic UI after a mutation:
+  update local view state immediately, then revalidate the authoritative backend response instead of trusting stale cache forever
 
 ## Delivery Checklist
 
@@ -147,5 +318,7 @@ Before finishing frontend work, verify:
 - the screen passes the Visual Review section above
 - copy is concise and task-focused
 - components align with the established theme and spacing system
+- cache mode matches the surface: auth-sensitive data is fresh, static reference data is not over-fetched, and browser storage is justified
+- auth/session persistence does not duplicate secrets across multiple browser storage layers without a deliberate reason
 - docs are aligned
 - lint, typecheck, and build pass unless blocked

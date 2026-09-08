@@ -4,7 +4,7 @@ Use this file as the top-level instruction set for any user request that may inv
 
 ## Mission
 
-This repository is a full-stack template designed for:
+This repository should be treated as a SaaS application foundation designed for:
 
 - fast interview execution
 - AI-assisted feature delivery
@@ -40,13 +40,14 @@ When a feature spans both backend and frontend, follow this order:
 
 1. Ask exactly 3 important clarification questions when the request is ambiguous.
 2. Confirm the user flow, API inputs, API outputs, and failure states.
-3. Decide whether an existing backend module and frontend route pattern can be reused.
-4. Define or update backend contracts first.
-5. Implement backend behavior and tests.
-6. Implement frontend integration against the confirmed backend contract.
-7. Add frontend validation states, loading states, and error states.
-8. Update documentation in both stacks when structure or flow changes.
-9. Verify backend and frontend separately before finishing.
+3. Confirm the freshness and caching expectation for each data touchpoint when stale data could affect trust, auth, or workflow correctness.
+4. Decide whether an existing backend module and frontend route pattern can be reused.
+5. Define or update backend contracts first.
+6. Implement backend behavior and tests.
+7. Implement frontend integration against the confirmed backend contract.
+8. Add frontend validation states, loading states, and error states.
+9. Update documentation in both stacks when structure or flow changes.
+10. Verify backend and frontend separately before finishing.
 
 ## Clarification Gate
 
@@ -65,8 +66,26 @@ If the user does not know the exact API shape, recommend one before implementati
 - keep backend business logic in services
 - keep frontend presentation logic in reusable sections
 - keep integration boundaries explicit between the two stacks
+- treat utility routes such as auth, onboarding gates, and setup screens like product workflows, not marketing surfaces
+- make cache and freshness rules explicit when data crosses the backend/frontend boundary
+- keep secrets and durable auth trust on the backend side whenever the architecture allows it
 - for time-boxed app work, avoid placeholder marketing copy and verbose explanatory UI
 - when frontend work is involved, prefer practical product UX over decorative layout filler
+- when frontend work is involved, design the end-to-end flow first and ensure loading, empty, error, success, and recovery states are part of the feature rather than follow-up polish
+
+## Documentation Checks
+
+When a task changes `ARCHITECTURE.md`, `README.md`, other Markdown docs, or Mermaid diagrams:
+
+- update the docs in the same task instead of leaving them for follow-up
+- treat Mermaid validity as part of compilation health, not optional polish
+- run the repo-root Mermaid checks before finishing:
+  `npm run docs:mermaid:check`
+- if the fast check fails or the diagrams were edited heavily, also run:
+  `npm run docs:mermaid:render`
+- use `npm run docs:mermaid:fix` only as a helper, then review the resulting diagrams manually
+- apply this doc-validation step whether the task was routed to backend, frontend, or full-stack
+- if doc validation cannot be run, say so clearly in the final response
 
 ## Handoff To Child Flows
 
@@ -83,8 +102,10 @@ Before finishing a feature:
 - backend tests and runtime checks should pass unless blocked
 - frontend lint, typecheck, and build should pass unless blocked
 - frontend output should be visually reviewed for hierarchy, spacing, theme alignment, and state completeness
+- cache behavior should match data sensitivity, freshness needs, and logout/role-change expectations
 - shared docs should reflect the implemented flow
 - Mermaid diagrams should be updated when architecture or request flow changed
+- Mermaid and Markdown architecture docs should pass the repo-root doc validation commands when they were touched
 
 ## Response Rules
 

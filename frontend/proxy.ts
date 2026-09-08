@@ -7,12 +7,63 @@ function isPublicPathname(pathname: string) {
   return pathname === "/auth";
 }
 
+function decodeBase64Url(value: string) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+
+  try {
+    return atob(padded);
+  } catch {
+    return null;
+  }
+}
+
+function readTokenExpiry(token: string) {
+  const [, payload] = token.split(".");
+
+  if (!payload) {
+    return null;
+  }
+
+  const decodedPayload = decodeBase64Url(payload);
+
+  if (!decodedPayload) {
+    return null;
+  }
+
+  try {
+    const parsedPayload = JSON.parse(decodedPayload) as { exp?: number };
+    return typeof parsedPayload.exp === "number" ? parsedPayload.exp : null;
+  } catch {
+    return null;
+  }
+}
+
+function isUsableAuthToken(token: string | undefined) {
+  if (!token) {
+    return false;
+  }
+
+  if (token.split(".").length !== 3) {
+    return false;
+  }
+
+  const expiry = readTokenExpiry(token);
+
+  if (expiry === null) {
+    return false;
+  }
+
+  return expiry > Date.now() / 1000;
+}
+
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const publicPath = isPublicPathname(pathname);
-  const hasToken = Boolean(request.cookies.get(AUTH_TOKEN_COOKIE)?.value);
+  const token = request.cookies.get(AUTH_TOKEN_COOKIE)?.value;
+  const hasUsableToken = isUsableAuthToken(token);
 
-  if (!hasToken && !publicPath) {
+  if (!hasUsableToken && !publicPath) {
     const loginUrl = new URL("/auth", request.url);
     const nextTarget = `${pathname}${request.nextUrl.search}`;
 
@@ -20,7 +71,16 @@ export function proxy(request: NextRequest) {
       loginUrl.searchParams.set("next", nextTarget);
     }
 
-    return NextResponse.redirect(loginUrl);
+    const response = NextResponse.redirect(loginUrl);
+
+    if (token) {
+      response.cookies.set(AUTH_TOKEN_COOKIE, "", {
+        maxAge: 0,
+        path: "/",
+      });
+    }
+
+    return response;
   }
 
   return NextResponse.next();

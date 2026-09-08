@@ -1,47 +1,27 @@
 import { tv } from "tailwind-variants";
 
 export const title = tv({
-  base: "inline font-semibold tracking-[-0.04em] leading-[0.95]",
+  base: "inline font-semibold tracking-[-0.05em] leading-[0.95] text-balance",
   variants: {
     color: {
-      violet: "from-[#FF1CF7] to-[#b249f8]",
-      yellow: "from-[#FF705B] to-[#FFB457]",
-      blue: "from-[#5EA2EF] to-[#0072F5]",
-      cyan: "from-[#00b7fa] to-[#01cfea]",
-      green: "from-[#6FEE8D] to-[#17c964]",
-      pink: "from-[#FF72E1] to-[#F54C7A]",
-      foreground: "dark:from-[#FFFFFF] dark:to-[#4B4B4B]",
+      blue: "text-accent",
+      foreground: "text-foreground",
+      muted: "text-muted",
     },
     size: {
-      sm: "text-3xl lg:text-4xl",
-      md: "text-[2.5rem] lg:text-5xl",
-      lg: "text-5xl lg:text-7xl",
-    },
-    fullWidth: {
-      true: "w-full block",
+      sm: "text-3xl sm:text-4xl",
+      md: "text-[2.5rem] sm:text-5xl",
+      lg: "text-5xl sm:text-6xl xl:text-[4.5rem]",
     },
   },
   defaultVariants: {
     size: "md",
+    color: "foreground",
   },
-  compoundVariants: [
-    {
-      color: [
-        "violet",
-        "yellow",
-        "blue",
-        "cyan",
-        "green",
-        "pink",
-        "foreground",
-      ],
-      class: "bg-clip-text text-transparent bg-gradient-to-b",
-    },
-  ],
 });
 
 export const subtitle = tv({
-  base: "my-2 block w-full max-w-full text-base leading-7 text-muted lg:text-lg",
+  base: "my-2 block w-full max-w-full text-base leading-8 text-muted lg:text-lg",
   variants: {
     fullWidth: {
       true: "!w-full",

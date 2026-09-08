@@ -36,10 +36,21 @@ function getErrorMessage(error: unknown) {
   return "Authentication failed. Please try again.";
 }
 
+function getInitialSessionState() {
+  const token = readPersistedAuthToken();
+
+  return {
+    status: "loading" as AuthStatus,
+    user: null,
+    token,
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [status, setStatus] = useState<AuthStatus>("loading");
-  const [user, setUser] = useState<AuthenticatedUser | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [initialSessionState] = useState(getInitialSessionState);
+  const [status, setStatus] = useState<AuthStatus>(initialSessionState.status);
+  const [user, setUser] = useState<AuthenticatedUser | null>(initialSessionState.user);
+  const [token, setToken] = useState<string | null>(initialSessionState.token);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,9 +61,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (!storedToken) {
         if (!isCancelled) {
+          setToken(null);
+          setUser(null);
           setStatus("unauthenticated");
         }
         return;
+      }
+
+      if (!isCancelled) {
+        setToken(storedToken);
+        setUser(null);
       }
 
       try {

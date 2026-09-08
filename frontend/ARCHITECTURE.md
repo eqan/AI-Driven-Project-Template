@@ -1,25 +1,27 @@
 # Frontend Architecture
 
-This frontend is a HeroUI and Next.js template optimized for aesthetic defaults, explicit extension points, and AI-assisted feature delivery.
+This frontend is now organized as a SaaS-ready workspace: public auth stays isolated, protected routes share one shell, and API/runtime boundaries are centralized before feature growth starts.
 
 ## System Map
 
 ```mermaid
 flowchart LR
     User[User]
-    Routes[App Router routes]
-    Sections[Section components]
+    PublicRoutes[Public routes]
+    ProtectedRoutes[Protected routes]
+    Shell[Workspace shell]
+    Sections[Route sections]
     Config[Config and content maps]
-    Theme[Theme and global styles]
-    API[Typed API layer]
-    Backend[Backend services]
+    Runtime[Runtime and API helpers]
+    Backend[FastAPI backend]
 
-    User --> Routes
-    Routes --> Sections
-    Routes --> Config
-    Routes --> API
-    Sections --> Theme
-    API --> Backend
+    User --> PublicRoutes
+    User --> ProtectedRoutes
+    ProtectedRoutes --> Shell
+    Shell --> Sections
+    Sections --> Config
+    Sections --> Runtime
+    Runtime --> Backend
 ```
 
 ## Current Layout
@@ -28,23 +30,78 @@ flowchart LR
 flowchart TD
     Frontend[frontend]
     App[app]
+    Public["(public)"]
+    Protected["(app)"]
     Components[components]
     Config[config]
+    Lib[lib]
     Styles[styles]
-    Docs[ARCHITECTURE.md]
 
     Frontend --> App
     Frontend --> Components
     Frontend --> Config
+    Frontend --> Lib
     Frontend --> Styles
-    Frontend --> Docs
 
-    App --> Home[page.tsx]
-    App --> Auth[auth/page.tsx]
-    App --> Architecture[architecture/page.tsx]
-    App --> Playbook[playbook/page.tsx]
-    App --> BackendApi[backend-api/page.tsx]
-    App --> Layout[layout.tsx]
+    App --> Public
+    App --> Protected
+    App --> RootLayout[layout.tsx]
+    Public --> Auth[auth/page.tsx]
+    Protected --> Home[page.tsx]
+    Protected --> Architecture[architecture/page.tsx]
+    Protected --> Playbook[playbook/page.tsx]
+    Protected --> BackendApi[backend-api/page.tsx]
+```
+
+## Route Topology
+
+```mermaid
+flowchart LR
+    Root[app/layout.tsx]
+    PublicLayout["app/(public)/layout.tsx"]
+    ProtectedLayout["app/(app)/layout.tsx"]
+    AuthGuard[AuthGuard]
+    AppShell[AppShell]
+    PublicPage["/auth"]
+    ProtectedPages["/, /architecture, /playbook, /backend-api"]
+
+    Root --> PublicLayout
+    Root --> ProtectedLayout
+    PublicLayout --> PublicPage
+    ProtectedLayout --> AuthGuard
+    AuthGuard --> AppShell
+    AppShell --> ProtectedPages
+```
+
+## Auth And Shell Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant P as Proxy
+    participant A as /auth route
+    participant G as Google Identity Services
+    participant Provider as AuthProvider
+    participant Guard as AuthGuard
+    participant Shell as AppShell
+    participant B as FastAPI backend
+
+    U->>P: Request protected route
+    alt No auth cookie
+        P-->>A: Redirect to /auth
+        A->>G: Render sign-in button
+        G-->>A: Google credential
+        A->>B: POST /google-login
+        B-->>A: Project JWT + user
+        A->>Provider: Persist auth cookie
+    else Auth cookie present
+        P-->>Guard: Allow route request
+    end
+    Guard->>Provider: Read auth cookie
+    Provider->>B: GET /verify-token
+    B-->>Provider: Verified user payload
+    Provider-->>Shell: Authenticated state
+    Shell-->>U: Protected workspace
 ```
 
 ## Rendering Flow
@@ -52,52 +109,22 @@ flowchart TD
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant R as Route
+    participant R as Route page
     participant C as Config
-    participant S as Section components
-    participant A as API layer
+    participant S as Shared sections
+    participant API as lib/api/*
     participant B as Backend
 
     U->>R: Navigate
-    R->>C: Read page config
-    R->>S: Compose sections
+    R->>C: Read copy and page maps
+    R->>S: Compose cards and panels
     opt Dynamic data
-        R->>A: Request data
-        A->>B: Call backend API
-        B-->>A: DTO response
-        A-->>R: View model
+        R->>API: Request typed payload
+        API->>B: Call backend endpoint
+        B-->>API: DTO response
+        API-->>R: Parsed view model
     end
-    R-->>U: Render page
-```
-
-## Page Composition
-
-```mermaid
-flowchart TD
-    Page[Route page]
-    Header[Page header]
-    Grid[Section grid]
-    Card[Reusable info cards]
-    CTA[CTA links/actions]
-
-    Page --> Header
-    Page --> Grid
-    Grid --> Card
-    Page --> CTA
-```
-
-## Styling Model
-
-```mermaid
-flowchart LR
-    Globals[styles/globals.css]
-    Tokens[CSS variables and Tailwind theme]
-    Components[HeroUI and local components]
-    Html[html.dark baseline]
-
-    Globals --> Tokens
-    Html --> Tokens
-    Tokens --> Components
+    R-->>U: Render product surface
 ```
 
 ## Integration Boundary
@@ -105,76 +132,40 @@ flowchart LR
 ```mermaid
 flowchart TD
     Env[".env.local"]
-    PublicVar["NEXT_PUBLIC_API_BASE_URL"]
+    ApiBase["NEXT_PUBLIC_API_BASE_URL"]
     GoogleClient["NEXT_PUBLIC_GOOGLE_CLIENT_ID"]
-    ApiClient[Typed auth/API layer]
-    Middleware[Next middleware auth gate]
-    Provider[Auth provider]
-    Pages[Route pages]
+    EnvHelper[lib/env.ts]
+    ApiClient[lib/api/client.ts]
+    AuthApi[lib/api/auth.ts]
+    AuthProvider[components/auth-provider.tsx]
+    Routes[Protected routes]
     Backend[FastAPI backend]
 
-    Env --> PublicVar
+    Env --> ApiBase
     Env --> GoogleClient
-    PublicVar --> ApiClient
-    GoogleClient --> Pages
-    Middleware --> Pages
-    Pages --> Provider
-    Provider --> ApiClient
-    ApiClient --> Backend
+    ApiBase --> EnvHelper
+    GoogleClient --> EnvHelper
+    EnvHelper --> ApiClient
+    ApiClient --> AuthApi
+    AuthApi --> AuthProvider
+    AuthProvider --> Routes
+    AuthApi --> Backend
 ```
 
-## Auth Flow
-
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant M as Next middleware
-    participant A as /auth route
-    participant G as Google Identity Services
-    participant P as Auth provider
-    participant B as FastAPI backend
-
-    U->>M: Request protected route
-    alt No auth cookie
-        M-->>A: Redirect to /auth
-        A->>G: Render Google sign-in button
-        G-->>A: id_token credential
-        A->>B: POST /google-login
-        B-->>A: Project JWT + user info
-        A->>P: Persist session
-    else Auth cookie present
-        M-->>P: Allow route render
-    end
-    P->>B: GET /verify-token
-    B-->>P: Verified JWT payload
-    P-->>U: Protected UI
-```
-
-## Feature Workflow
+## Composition Rule
 
 ```mermaid
 flowchart TD
-    Clarify[Ask 3 clarifying questions]
-    Screen[Confirm route and UX states]
-    Contract[Confirm API inputs and outputs]
-    Reuse{Existing section fits?}
-    Extend[Extend current route/components]
-    New[Create new route or section]
-    Build[Implement UI]
-    States[Add loading, empty, error states]
-    Verify[Run lint and build]
-    Docs[Update docs and AI instructions]
+    Route[Route page]
+    Header[PageHeader]
+    Cards[InfoCard and custom panels]
+    Shell[AppShell frame]
+    Helpers[lib helpers]
 
-    Clarify --> Screen
-    Screen --> Contract
-    Contract --> Reuse
-    Reuse -->|Yes| Extend
-    Reuse -->|No| New
-    Extend --> Build
-    New --> Build
-    Build --> States
-    States --> Verify
-    Verify --> Docs
+    Shell --> Route
+    Route --> Header
+    Route --> Cards
+    Route --> Helpers
 ```
 
 ## Guardrails
@@ -184,29 +175,15 @@ flowchart TD
     Prefer[Prefer]
     Avoid[Avoid]
 
-    Prefer --> P1[Server components by default]
-    Prefer --> P2[Reusable sections]
-    Prefer --> P3[Config-driven page content]
-    Prefer --> P4[Typed API integration]
-    Prefer --> P5[One visual language]
+    Prefer --> P1[Route groups for access boundaries]
+    Prefer --> P2[One shell for protected routes]
+    Prefer --> P3[Server-first pages]
+    Prefer --> P4[Shared request parsing]
+    Prefer --> P5[Reusable section composition]
 
-    Avoid --> A1[Random per-page styling]
-    Avoid --> A2[Fetch logic inside leaf components]
-    Avoid --> A3[Unclear loading states]
-    Avoid --> A4[One-off layout experiments]
-    Avoid --> A5[Frontend contracts drifting from backend DTOs]
-```
-
-## Theme Baseline
-
-```mermaid
-flowchart LR
-    Stable[Stable default dark theme]
-    HtmlClass[html.dark]
-    Globals[Global CSS variables]
-    UI[HeroUI and route sections]
-
-    Stable --> HtmlClass
-    HtmlClass --> Globals
-    Globals --> UI
+    Avoid --> A1[Auth UI inside protected shell]
+    Avoid --> A2[Fetch logic scattered across leaf components]
+    Avoid --> A3[Template hero layouts for product screens]
+    Avoid --> A4[Per-page visual systems]
+    Avoid --> A5[Docs drifting from real structure]
 ```

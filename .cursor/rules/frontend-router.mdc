@@ -19,8 +19,16 @@ For frontend feature requests, the parent instructions include a clarification-f
 - reuse an existing section or component pattern when relevant
 - keep the visual language consistent
 - design pages like real product UI, not filler-heavy showcase screens
+- treat the repo as a SaaS workspace by default rather than a marketing template
 - keep copy brief and useful
 - visually integrate third-party controls into the surrounding theme
+- design flows before screens and verify state handling, recovery, and mobile fit
+- keep domain rules out of presentation components and keep UI responsibilities local to the surface
+- avoid decorative filler, nested cards, and generic hero layouts when building actual product pages
+- keep auth and access pages especially lean: utility-first layout, one primary action, no promotional card grids unless explicitly requested
+- default to safer frontend persistence: do not drop secrets into browser storage and be explicit about cache freshness for each new data surface
+- treat browser caching as a product decision with scenarios: `no-store` for auth and user-sensitive data, short-lived or focus-based revalidation for dashboards and search, and longer caching only for public reference content
+- commit to a clear aesthetic direction and avoid generic AI-generated frontend patterns
 - self-review hierarchy, spacing, states, and mobile fit before finishing
 - verify with lint, typecheck, and build
 

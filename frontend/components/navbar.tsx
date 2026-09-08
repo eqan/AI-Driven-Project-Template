@@ -14,8 +14,6 @@ export function Navbar() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { signOut, status, user } = useAuth();
-  const isAuthenticated = status === "authenticated";
-  const isAuthPage = pathname === "/auth";
 
   function handleSignOut() {
     signOut();
@@ -23,38 +21,35 @@ export function Navbar() {
     router.replace("/auth");
   }
 
+  function isActivePath(href: string) {
+    return href === "/" ? pathname === href : pathname.startsWith(href);
+  }
+
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/10 bg-background/75 backdrop-blur-xl">
-      <header className="mx-auto flex h-18 max-w-7xl items-center justify-between gap-6 px-6">
-        <div className="flex items-center gap-4">
+    <nav className="sticky top-4 z-40">
+      <header className="flex items-center gap-4 rounded-[28px] border border-white/10 bg-background/72 px-4 py-4 shadow-[0_24px_90px_rgba(7,10,20,0.18)] backdrop-blur-xl sm:px-5">
+        <div className="flex min-w-0 items-center gap-4 lg:hidden">
           <NextLink className="flex items-center gap-3" href="/">
             <span className="rounded-2xl border border-white/12 bg-white/6 p-2 text-accent shadow-[0_12px_36px_rgba(48,88,255,0.18)]">
-              <Logo size={24} />
+              <Logo size={20} />
             </span>
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.22em] text-accent/80">
-                Project Template
+                {siteConfig.name}
               </p>
-              <p className="text-sm text-muted">
-                HeroUI frontend baseline
-              </p>
+              <p className="text-sm text-muted">{siteConfig.productTagline}</p>
             </div>
           </NextLink>
         </div>
 
-        <div className="hidden items-center gap-2 md:flex">
-          {isAuthenticated ? siteConfig.navItems.map((item) => {
-            const isActive =
-              item.href === "/"
-                ? pathname === item.href
-                : pathname.startsWith(item.href);
-
+        <div className="hidden min-w-0 items-center gap-2 md:flex lg:hidden">
+          {siteConfig.navItems.map((item) => {
             return (
               <NextLink
                 key={item.href}
                 className={clsx(
                   "rounded-full px-4 py-2 text-sm transition-colors",
-                  isActive
+                  isActivePath(item.href)
                     ? "bg-white/10 text-foreground"
                     : "text-muted hover:text-foreground",
                 )}
@@ -63,15 +58,15 @@ export function Navbar() {
                 {item.label}
               </NextLink>
             );
-          }) : (
-            <div className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-muted">
-              {isAuthPage ? "Secure Google sign-in" : "Authentication required"}
-            </div>
-          )}
+          })}
         </div>
 
-        <div className="hidden items-center gap-3 md:flex">
-          {isAuthenticated && user ? (
+        <div className="ml-auto hidden items-center gap-3 sm:flex">
+          <div className="rounded-full border border-white/10 bg-white/6 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted">
+            Protected workspace
+          </div>
+
+          {user ? (
             <>
               <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/6 px-3 py-2">
                 <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-accent/20 text-sm font-semibold text-foreground">
@@ -80,6 +75,9 @@ export function Navbar() {
                     <img
                       alt={user.name}
                       className="h-full w-full object-cover"
+                      decoding="async"
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
                       src={user.picture}
                     />
                   ) : (
@@ -96,20 +94,17 @@ export function Navbar() {
                 onClick={handleSignOut}
                 type="button"
               >
-                Logout
+                Sign out
               </button>
             </>
           ) : (
-            <NextLink
-              className="rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-background transition-transform hover:-translate-y-0.5"
-              href="/auth"
-            >
-              Login / Signup
-            </NextLink>
+            <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-muted">
+              {status === "loading" ? "Restoring session" : "Account unavailable"}
+            </div>
           )}
         </div>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="ml-auto flex items-center gap-2 sm:hidden">
           <button
             aria-expanded={isMenuOpen}
             aria-label="Toggle menu"
@@ -143,53 +138,45 @@ export function Navbar() {
       </header>
 
       {isMenuOpen ? (
-        <div className="border-t border-white/10 px-6 pb-4 pt-3 md:hidden">
+        <div className="mt-3 rounded-[28px] border border-white/10 bg-background/88 px-4 pb-4 pt-4 shadow-[0_24px_90px_rgba(7,10,20,0.18)] backdrop-blur-xl sm:hidden">
           <div className="flex flex-col gap-2">
-            {isAuthenticated ? siteConfig.navItems.map((item) => {
-              const isActive =
-                item.href === "/"
-                  ? pathname === item.href
-                  : pathname.startsWith(item.href);
-
+            {siteConfig.navItems.map((item) => {
               return (
                 <NextLink
                   key={item.href}
                   className={clsx(
                     "rounded-2xl px-4 py-3 text-sm transition-colors",
-                    isActive
+                    isActivePath(item.href)
                       ? "bg-white/10 text-foreground"
                       : "text-muted hover:text-foreground",
                   )}
                   href={item.href}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {item.label}
+                  <span className="block font-semibold text-foreground">{item.label}</span>
+                  <span className="mt-1 block text-sm text-muted">{item.description}</span>
                 </NextLink>
               );
-            }) : (
-              <NextLink
-                className="rounded-2xl bg-foreground px-4 py-3 text-sm font-semibold text-background"
-                href="/auth"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Login / Signup
-              </NextLink>
-            )}
+            })}
 
-            {isAuthenticated && user ? (
+            {user ? (
               <div className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3">
                 <p className="text-sm font-medium text-foreground">{user.name}</p>
                 <p className="mt-1 text-xs text-muted">{user.email}</p>
               </div>
-            ) : null}
+            ) : (
+              <div className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3 text-sm text-muted">
+                {status === "loading" ? "Restoring session" : "Account unavailable"}
+              </div>
+            )}
 
-            {isAuthenticated ? (
+            {user ? (
               <button
                 className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3 text-left text-sm font-semibold text-foreground"
                 onClick={handleSignOut}
                 type="button"
               >
-                Logout
+                Sign out
               </button>
             ) : null}
           </div>

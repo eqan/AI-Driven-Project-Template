@@ -1,6 +1,6 @@
 # Frontend Template
 
-This frontend is a Next.js App Router and HeroUI baseline for fast product delivery, strong visual defaults, and AI-assisted scaling.
+This frontend is a Next.js App Router and HeroUI workspace baseline for SaaS-style product delivery, protected app flows, and AI-assisted scaling.
 
 ## Stack
 
@@ -40,6 +40,10 @@ The frontend now protects the app behind Google sign-in. `NEXT_PUBLIC_GOOGLE_CLI
 must match the Google Identity Services web client configured for the same origins as
 the frontend app.
 
+`NEXT_PUBLIC_API_BASE_URL` should point to the backend origin and should use `https`
+outside local development, because frontend auth requests send bearer tokens to that
+API boundary.
+
 ## Commands
 
 ```bash
@@ -56,12 +60,23 @@ npm run build
 ```text
 frontend/
 ├── app/
+│   ├── (app)/
+│   ├── (public)/
+│   ├── layout.tsx
+│   └── providers.tsx
 ├── components/
 ├── config/
+├── lib/
 ├── public/
 ├── styles/
 ├── ARCHITECTURE.md
 └── package.json
 ```
+
+Route posture:
+
+- `app/(public)`: auth and other non-workspace entry flows
+- `app/(app)`: protected routes that share the workspace shell
+- `lib/`: runtime helpers and API request boundaries
 
 Main architecture guidance lives in [`ARCHITECTURE.md`](/Users/eqanahmad/Desktop/Project-Template/frontend/ARCHITECTURE.md:1).

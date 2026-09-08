@@ -1,15 +1,29 @@
 export type NavItem = {
   label: string;
   href: string;
+  description: string;
 };
 
-export type MetricCard = {
+export type WorkspaceSignal = {
   value: string;
   label: string;
   note: string;
 };
 
+export type ProductArea = {
+  title: string;
+  href: string;
+  status: string;
+  description: string;
+  outcome: string;
+};
+
 export type Principle = {
+  title: string;
+  description: string;
+};
+
+export type ArchitectureLayer = {
   title: string;
   description: string;
 };
@@ -19,8 +33,26 @@ export type WorkflowStep = {
   description: string;
 };
 
+export type DeliveryTrack = {
+  title: string;
+  status: string;
+  description: string;
+};
+
 export type IntegrationSurface = {
   title: string;
+  description: string;
+};
+
+export type BackendDomain = {
+  title: string;
+  route: string;
+  description: string;
+};
+
+export type QuickLink = {
+  label: string;
+  href: string;
   description: string;
 };
 
@@ -28,97 +60,242 @@ export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
   name: "Project Template",
+  productTagline: "Protected product workspace",
   description:
-    "A HeroUI and Next.js frontend template shaped for interview-speed delivery, AI-assisted scaling, and clean backend integration.",
+    "A SaaS-ready Next.js frontend shaped for protected routes, reusable sections, and clean backend integration.",
   navItems: [
     {
-      label: "Home",
+      label: "Overview",
       href: "/",
+      description: "Workspace shell, scaling posture, and the current product surface.",
     },
     {
       label: "Architecture",
       href: "/architecture",
+      description: "Route groups, shell composition, and rendering boundaries.",
     },
     {
       label: "Playbook",
       href: "/playbook",
+      description: "The repeatable delivery loop for frontend feature work.",
     },
     {
       label: "Backend API",
       href: "/backend-api",
+      description: "Integration posture for auth, tickets, stats, ingestion, and chat.",
     },
   ] satisfies NavItem[],
-  metrics: [
+  workspaceSignals: [
     {
-      value: "App Router",
-      label: "Structure",
-      note: "Server-first routes with isolated client islands where interaction is needed.",
+      value: "Public + protected layouts",
+      label: "Route model",
+      note: "Authentication stays outside the workspace shell so product routes inherit a cleaner frame.",
     },
     {
-      value: "HeroUI v3",
-      label: "Design System",
-      note: "Aesthetic primitives with Tailwind v4 and clear ownership in-repo.",
+      value: "Thin client islands",
+      label: "Rendering posture",
+      note: "Pages stay server-first while auth, navigation, and sign-in interactions remain local to client components.",
     },
     {
-      value: ".env + config",
-      label: "Runtime",
-      note: "Frontend runtime stays simple and production-ready from the start.",
+      value: "Central env + API client",
+      label: "Integration boundary",
+      note: "Runtime validation and request parsing are reusable now instead of being duplicated at each entry point.",
     },
-  ] satisfies MetricCard[],
+    {
+      value: "Docs wired to structure",
+      label: "Change hygiene",
+      note: "Architecture and README stay aligned with how routes, shells, and helpers actually fit together.",
+    },
+  ] satisfies WorkspaceSignal[],
+  productAreas: [
+    {
+      title: "Workspace overview",
+      href: "/",
+      status: "Live now",
+      description:
+        "A real product home that orients the team around modules, readiness, and next actions instead of a template hero.",
+      outcome:
+        "Use this as the baseline surface for dashboard summaries, launch checklists, and module entry points.",
+    },
+    {
+      title: "Architecture guide",
+      href: "/architecture",
+      status: "System doc",
+      description:
+        "Shows how route groups, the app shell, and centralized helpers work together as the app grows.",
+      outcome:
+        "Keeps future contributors aligned without repeating the same structure explanation in every task.",
+    },
+    {
+      title: "Delivery playbook",
+      href: "/playbook",
+      status: "Operator doc",
+      description:
+        "Captures the implementation loop, state discipline, and review standards for new frontend work.",
+      outcome:
+        "Makes AI-assisted changes more consistent and easier to extend under deadline pressure.",
+    },
+    {
+      title: "Backend integration map",
+      href: "/backend-api",
+      status: "API-ready",
+      description:
+        "Connects frontend route planning to the existing auth, ticket, ingestion, chatbot, and analytics domains.",
+      outcome:
+        "Helps the next data-backed route land against an existing contract instead of inventing a new one.",
+    },
+  ] satisfies ProductArea[],
   principles: [
     {
-      title: "Route by intent, not by page count",
+      title: "Split access flows before features pile up",
       description:
-        "Use route groups and focused sections so feature growth does not flatten the app into a dumping ground.",
+        "Public auth and protected workspace routes should not share the same layout contract once the app starts behaving like software.",
     },
     {
-      title: "Keep data boundaries explicit",
+      title: "Centralize integration helpers early",
       description:
-        "Separate config, API calls, view models, and presentation so future AI edits stay surgical.",
+        "Environment validation and request parsing should live behind shared helpers before more modules start making fetch calls.",
     },
     {
-      title: "Compose with reusable sections",
+      title: "Grow the product by sections, not page-sized rewrites",
       description:
-        "New pages should be assembled from sections and cards rather than one-off layout experiments.",
+        "Reusable cards, headers, and panels keep route files readable while making the next SaaS surface cheaper to add.",
     },
   ] satisfies Principle[],
+  architectureLayers: [
+    {
+      title: "Route groups split public and protected surfaces",
+      description:
+        "Auth now renders in a public layout while the workspace routes share a dedicated protected app shell.",
+    },
+    {
+      title: "One workspace shell owns navigation and framing",
+      description:
+        "Sidebar, top bar, account controls, and route spacing are now controlled from one place instead of leaking into every page.",
+    },
+    {
+      title: "Runtime and API logic live behind reusable helpers",
+      description:
+        "Frontend environment checks and request parsing are centralized so future auth, stats, and CRUD modules reuse the same boundary.",
+    },
+    {
+      title: "Pages stay content-focused",
+      description:
+        "Route files mainly compose product sections and stateful panels now, which makes them easier to review and extend.",
+    },
+  ] satisfies ArchitectureLayer[],
   workflow: [
     {
-      title: "Clarify the screen and user action",
+      title: "Confirm the route, actor, and state path",
       description:
-        "Confirm the route, actor, happy path, and failure states before building UI.",
+        "Define who uses the screen, what they need to finish, and what loading, empty, error, and success look like.",
     },
     {
-      title: "Confirm the API contract",
+      title: "Lock the contract before UI sprawl starts",
       description:
-        "Lock request and response shapes before wiring forms, tables, or detail views.",
+        "Confirm request and response shapes before wiring tables, forms, or optimistic actions around them.",
     },
     {
-      title: "Reuse an existing section pattern",
+      title: "Reuse shell patterns before inventing layout",
       description:
-        "Extend cards, shell layouts, lists, and actions before introducing a fresh visual language.",
+        "Extend shared cards, shell panels, and route sections first so the product still feels like one system.",
     },
     {
-      title: "Add loading, empty, and error states",
+      title: "Design the full async state path",
       description:
-        "Every feature should read as complete even before backend data is fully live.",
+        "Treat loading, empty, recovery, and success behavior as part of the feature instead of polish for later.",
     },
   ] satisfies WorkflowStep[],
+  deliveryTracks: [
+    {
+      title: "Shell and routing",
+      status: "Foundation",
+      description:
+        "Protected routes now share a workspace frame while auth stays isolated as a public flow.",
+    },
+    {
+      title: "Reusable sections",
+      status: "Composition",
+      description:
+        "Cards, headers, and summary panels are shared so new routes grow through composition.",
+    },
+    {
+      title: "Integration layer",
+      status: "Readiness",
+      description:
+        "Environment validation and request helpers are ready for future typed modules.",
+    },
+    {
+      title: "Docs and verification",
+      status: "Ops",
+      description:
+        "Architecture docs, lint, typecheck, and build now reinforce the structure instead of chasing it later.",
+    },
+  ] satisfies DeliveryTrack[],
   integrations: [
     {
-      title: "Environment-driven API base URL",
+      title: "Environment contract",
       description:
-        "Use NEXT_PUBLIC_API_BASE_URL so local, staging, and production remain predictable.",
+        "NEXT_PUBLIC_API_BASE_URL and NEXT_PUBLIC_GOOGLE_CLIENT_ID are validated centrally before the UI depends on them.",
     },
     {
-      title: "Typed fetch layer",
+      title: "Shared API client",
       description:
-        "Centralize backend calls instead of scattering fetch logic across components.",
+        "Auth already runs through reusable request parsing and error handling that future modules can extend.",
     },
     {
-      title: "Feature-ready app shell",
+      title: "Backend-ready product shell",
       description:
-        "Navigation, hero section, and content panels provide a stable base for dashboards or product flows.",
+        "Navigation and route framing are now shaped around stats, ticketing, ingestion, and chat instead of a generic homepage.",
     },
   ] satisfies IntegrationSurface[],
+  backendDomains: [
+    {
+      title: "Auth",
+      route: "/google-login + /verify-token",
+      description:
+        "Bootstraps Google sign-in, verifies JWT state, and gates the protected workspace.",
+    },
+    {
+      title: "Stats",
+      route: "/stats",
+      description:
+        "Supports dashboard cards, reporting views, and lightweight analytics summaries.",
+    },
+    {
+      title: "Ticketing",
+      route: "/tickets + /ticket/{uuid}",
+      description:
+        "Fits queue views, detail surfaces, and operator workflows inside the shared shell.",
+    },
+    {
+      title: "Ingestion",
+      route: "/ingestion/*",
+      description:
+        "Provides room for scrape, indexing, and search tooling without changing the app frame again.",
+    },
+    {
+      title: "Chatbot",
+      route: "/chatbot-response* + /all-chats",
+      description:
+        "Can evolve into conversation workspaces, review panels, and streaming task flows.",
+    },
+  ] satisfies BackendDomain[],
+  quickLinks: [
+    {
+      label: "Review architecture",
+      href: "/architecture",
+      description: "See the route-group split and shell ownership at a glance.",
+    },
+    {
+      label: "Check the playbook",
+      href: "/playbook",
+      description: "Use the feature-delivery loop before adding more screens.",
+    },
+    {
+      label: "Plan API routes",
+      href: "/backend-api",
+      description: "Map the next frontend module to a backend contract first.",
+    },
+  ] satisfies QuickLink[],
 };

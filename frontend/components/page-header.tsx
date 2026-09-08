@@ -18,7 +18,7 @@ export function PageHeader({
       </p>
       <div className="max-w-3xl space-y-3">
         <h1 className={title({ size: "lg", color: "foreground" })}>{heading}</h1>
-        <p className={subtitle({ fullWidth: true, class: "max-w-2xl text-base lg:text-lg" })}>
+        <p className={subtitle({ class: "max-w-2xl text-base lg:text-lg" })}>
           {description}
         </p>
       </div>
