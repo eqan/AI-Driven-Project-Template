@@ -1,0 +1,1069 @@
+// Insert full embed script implementing chatbot injection and logic
+(function () {
+  // -------------------------------
+  // 1. Styles (CSS)
+  // -------------------------------
+  // Read color config from script tag if present
+  let userColors = {};
+  try {
+    // Find the script tag that loaded this file
+    let scriptTag = document.currentScript;
+    if (!scriptTag) {
+      // Fallback for browsers that don't support document.currentScript
+      const scripts = document.querySelectorAll('script[src]');
+      scriptTag = Array.from(scripts).find(s => s.src && s.src.includes('embed.js'));
+    }
+    if (scriptTag && scriptTag.dataset.colors) {
+      userColors = JSON.parse(scriptTag.dataset.colors);
+    } else if (window.ChatbotWidgetConfig?.colors) {
+      userColors = window.ChatbotWidgetConfig.colors;
+    }
+  } catch (e) {
+    console.warn('Invalid data-colors JSON for chatbot:', e);
+  }
+
+  const defaultColors = {
+    primary: "#5350c4",
+    primaryDark: "#3d39ac",
+    accent: "#ccccf5"
+  };
+  const colors = { ...defaultColors, ...userColors };
+
+  const css = `@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+  box-sizing: border-box;
+}
+
+#chatbot-toggler {
+  position: fixed;
+  bottom: 30px;
+  right: 35px;
+  height: 50px;
+  width: 50px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  background: ${colors.primary};
+  transition: all 0.2s ease;
+}
+
+body.show-chatbot #chatbot-toggler {
+  transform: rotate(90deg);
+}
+
+#chatbot-toggler span {
+  color: #fff;
+  position: absolute;
+}
+
+body.show-chatbot #chatbot-toggler span:first-child, #chatbot-toggler span:last-child{
+  opacity: 0;
+}
+
+body.show-chatbot #chatbot-toggler span:last-child{
+  opacity: 1;
+}
+
+.chatbot-popup {
+  position: fixed;
+  right: 25px;
+  bottom: 90px;
+  width: 420px;
+  background: #fff;
+  overflow: hidden;
+  border-radius: 15px;
+  opacity: 0;
+  transform: scale(0.2);
+  transform-origin: bottom right;
+  pointer-events: none;
+  box-shadow: 0 0 128px rgba(0, 0, 0, 0.1), 0 32px 64px -48px rgba(0, 0, 0, 0.5);
+  transition: all 0.1s ease;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - 120px);
+}
+
+body.show-chatbot .chatbot-popup {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  background: ${colors.primary};
+  padding: 15px 22px;
+  justify-content: space-between;
+}
+
+.chat-header .header-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.header-info .chatbot-logo {
+  height: 35px;
+  width: 35px;
+  padding: 6px;
+  fill: ${colors.primary};
+  flex-shrink: 0;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.header-info .logo-text {
+  color: #fff;
+  font-size: 1.31rem;
+  font-weight: 600;
+}
+
+.chat-header #close-chatbot {
+  border: none;
+  color: #fff;
+  height: 40px;
+  width: 40px;
+  font-size: 1.9rem;
+  margin-right: -10px;
+  padding-top: 2px;
+  cursor: pointer;
+  border-radius: 50%;
+  background: none;
+  transition: 0.2s ease;
+}
+
+.chat-header #close-chatbot:hover {
+  background: ${colors.primaryDark};
+}
+
+.chat-body {
+  padding: 25px 22px;
+  display: flex;
+  gap: 20px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: ${colors.accent} transparent;
+}
+
+.chat-body .message {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+}
+
+.chat-body .bot-message .bot-avatar {
+  height: 35px;
+  width: 35px;
+  padding: 6px;
+  fill: #fff;
+  flex-shrink: 0;
+  margin-bottom: 2px;
+  align-self: flex-end;
+  background: ${colors.primary};
+  border-radius: 50%;
+}
+
+.chat-body .user-message {
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.chat-body .message .message-text {
+  padding: 12px 16px;
+  max-width: 75%;
+  font-size: 0.95rem;
+  background: #f2f2ff;
+}
+
+.chat-body .bot-message.thinking .message-text {
+  padding: 2px 16px;
+}
+
+.chat-body .bot-message .message-text {
+  background-color: #f2f2ff;
+  border-radius: 13px 13px 13px 3px;
+}
+
+.chat-body .user-message .message-text {
+  color: #fff;
+  background-color: ${colors.primary};
+  border-radius: 13px 13px 3px 13px;
+}
+
+.chat-body .bot-message .thinking-indicator {
+  display: flex;
+  gap: 4px;
+  padding-block: 15px;
+}
+
+.chat-body .bot-message .thinking-indicator .dot:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.chat-body .bot-message .thinking-indicator .dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.chat-body .bot-message .thinking-indicator .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.chat-body .bot-message .thinking-indicator .dot {
+  height: 7px;
+  width: 7px;
+  opacity: 0.7;
+  border-radius: 50%;
+  background: ${colors.accent};
+  animation: dotPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%,
+  44% {
+    transform: translateY(0);
+  }
+
+  28% {
+    opacity: 0.4;
+    transform: translateY(-4px);
+  }
+
+  44% {
+    opacity: 0.2;
+  }
+}
+
+.chat-body .bot-message.streaming .message-text::after {
+  content: "\\25CF";
+  display: inline-block;
+  color: ${colors.primary};
+  animation: cursorBlink 1s steps(2) infinite;
+  margin-left: 2px;
+  font-size: 0.7em;
+  vertical-align: baseline;
+}
+
+@keyframes cursorBlink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.chat-footer {
+  position: relative;
+  width: 100%;
+  background: white;
+  padding: 15px 22px 20px;
+}
+
+.chat-footer .chat-form {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 0;
+  outline: 1px solid ${colors.accent};
+}
+
+.chat-footer .chat-form:focus-within {
+  outline: 2px solid ${colors.primary};
+}
+
+.chat-form .message-input {
+  border: none;
+  outline: none;
+  height: 47px;
+  width: 100%;
+  resize: none;
+  max-height: 180px;
+  white-space: pre-line;
+  font-size: 1rem;
+  padding: 13px;
+  border-radius: inherit;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.chat-form .message-input::hover {
+  scrollbar-color: ${colors.accent} transparent;
+}
+
+.chat-form .chat-controls {
+  display: flex;
+  height: 47px;
+  gap: 3px;
+  align-items: center;
+  align-self: flex-end;
+  padding-right: 6px;
+}
+
+.chat-form .chat-controls button {
+  height: 35px;
+  width: 35px;
+  border: none;
+  font-size: 1.15rem;
+  cursor: pointer;
+  color: #706db0;
+  background: none;
+  border-radius: 50%;
+  transition: 0.2s ease;
+}
+
+.chat-form .chat-controls #send-message {
+  color: #fff;
+  display: none;
+  background: ${colors.primary};
+}
+
+.chat-form .message-input:valid ~ .chat-controls #send-message {
+  display: block;
+}
+
+.chat-form .chat-controls #send-message:hover {
+  background: ${colors.primaryDark};
+}
+
+.chat-form .chat-controls button:hover {
+  background: #f1f1f1;
+}
+
+.chat-body .user-message .attachment {
+  width: 50%;
+  margin-top: -7px;
+  border-radius: 13px 3px 13px 3px;
+}
+
+/* Support ticket form */
+.support-form-wrapper {
+  width: 100%;
+}
+.support-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+.support-form label {
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.support-form input,
+.support-form textarea,
+.support-form select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: "Inter", sans-serif;
+}
+.support-form button[type="submit"] {
+  align-self: flex-start;
+  background: ${colors.primary};
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.support-form button[type="submit"]:hover {
+  background: ${colors.primaryDark};
+}
+
+em-emoji-picker {
+  position: absolute;
+  left: 50%;
+  top: -337px;
+  width: 100%;
+  max-width: 350px;
+  max-height: 330px;
+  visibility: hidden;
+  transform: translateX(-50%);
+}
+
+ body.show-emoji-picker em-emoji-picker {
+  visibility: visible;
+ }
+/* Responsive for mobile screen */
+@media screen and (max-width: 600px) {
+  .chatbot-popup {
+    width: 100%;
+    right: 0;
+    bottom: 0;
+    border-radius: 0;
+    height: 100%;
+  }
+
+  .chat-header .header-info .logo-text {
+    font-size: 1.1rem;
+  }
+
+  .chat-body {
+    height: 100%;
+    margin-bottom: 0;
+  }
+
+  .chat-body .message .message-text {
+    max-width: 85%;
+  }
+
+  .chat-footer .chat-form {
+    border-radius: 0;
+    border-radius: 25px;
+  }
+
+  .chat-footer .chat-form .message-input {
+    border-radius: 0;
+  }
+
+  .chat-footer .chat-form .chat-controls {
+    padding-right: 10px;
+  }
+
+  .chat-footer .chat-form .chat-controls button {
+    height: 40px;
+    width: 40px;
+  }
+}
+
+/* Auth overlay */
+.chatbot-auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+}
+.chatbot-auth-overlay .auth-modal {
+  background: #ffffff;
+  padding: 30px 35px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.chatbot-auth-overlay .auth-modal h3 {
+  margin-bottom: 25px;
+  font-size: 1.15rem;
+  color: #333;
+}
+`;
+
+  // -------------------------------
+  // 2. HTML Markup
+  // -------------------------------
+  const markup = `
+    <button id="chatbot-toggler">
+      <span class="material-symbols-outlined">mode_comment</span>
+      <span class="material-symbols-rounded">close</span>
+    </button>
+
+    <div class="chatbot-popup">
+      <div class="chat-header">
+        <div class="header-info">
+          <svg class="chatbot-logo" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 1024 1024"><path d="M738.3 287.6H285.7c-59 0-106.8 47.8-106.8 106.8v303.1c0 59 47.8 106.8 106.8 106.8h81.5v111.1c0 .7.8 1.1 1.4.7l166.9-110.6 41.8-.8h117.4l43.6-.4c59 0 106.8-47.8 106.8-106.8V394.5c0-59-47.8-106.9-106.8-106.9zM351.7 448.2c0-29.5 23.9-53.5 53.5-53.5s53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5-53.5-23.9-53.5-53.5zm157.9 267.1c-67.8 0-123.8-47.5-132.3-109h264.6c-8.6 61.5-64.5 109-132.3 109zm110-213.7c-29.5 0-53.5-23.9-53.5-53.5s23.9-53.5 53.5-53.5 53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5zM867.2 644.5V453.1h26.5c19.4 0 35.1 15.7 35.1 35.1v121.1c0 19.4-15.7 35.1-35.1 35.1h-26.5zM95.2 609.4V488.2c0-19.4 15.7-35.1 35.1-35.1h26.5v191.3h-26.5c-19.4 0-35.1-15.7-35.1-35.1zM561.5 149.6c0 23.4-15.6 43.3-36.9 49.7v44.9h-30v-44.9c-21.4-6.5-36.9-26.3-36.9-49.7 0-28.6 23.3-51.9 51.9-51.9s51.9 23.3 51.9 51.9z"></path></svg>
+          <h2 class="logo-text">${window.ChatbotWidgetConfig.title || 'Chatbot'}</h2>
+        </div>
+        <button id="close-chatbot" class="material-symbols-rounded">keyboard_arrow_down</button>
+      </div>
+      <div class="chat-body">
+        <div class="message bot-message">
+          <svg class="bot-avatar" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 1024 1024"><path d="M738.3 287.6H285.7c-59 0-106.8 47.8-106.8 106.8v303.1c0 59 47.8 106.8 106.8 106.8h81.5v111.1c0 .7.8 1.1 1.4.7l166.9-110.6 41.8-.8h117.4l43.6-.4c59 0 106.8-47.8 106.8-106.8V394.5c0-59-47.8-106.9-106.8-106.9zM351.7 448.2c0-29.5 23.9-53.5 53.5-53.5s53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5-53.5-23.9-53.5-53.5zm157.9 267.1c-67.8 0-123.8-47.5-132.3-109h264.6c-8.6 61.5-64.5 109-132.3 109zm110-213.7c-29.5 0-53.5-23.9-53.5-53.5s23.9-53.5 53.5-53.5 53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5zM867.2 644.5V453.1h26.5c19.4 0 35.1 15.7 35.1 35.1v121.1c0 19.4-15.7 35.1-35.1 35.1h-26.5zM95.2 609.4V488.2c0-19.4 15.7-35.1 35.1-35.1h26.5v191.3h-26.5c-19.4 0-35.1-15.7-35.1-35.1zM561.5 149.6c0 23.4-15.6 43.3-36.9 49.7v44.9h-30v-44.9c-21.4-6.5-36.9-26.3-36.9-49.7 0-28.6 23.3-51.9 51.9-51.9s51.9 23.3 51.9 51.9z"></path></svg>
+          <div class="message-text">Hey there 👋 <br/>How can i help you today?</div>
+        </div>
+      </div>
+      <div class="chat-footer">
+        <form action="#" class="chat-form">
+          <textarea placeholder="Message..." class="message-input" required></textarea>
+          <div class="chat-controls">
+            <button type="button" id="emoji-picker" class="material-symbols-rounded">sentiment_satisfied</button>
+            <button type="submit" id="send-message" class="material-symbols-rounded">arrow_upward</button>
+          </div>
+        </form>
+      </div>
+    </div>`;
+
+  // -------------------------------
+  // 2. Namespace / Scoping helpers
+  // -------------------------------
+  const WIDGET_ROOT_ID = "sa-widget"; // Stable id for the widget wrapper
+
+  // Prefix selectors with the widget root so styles don\'t leak.
+  function scopeCss(cssText) {
+    // Rewrite the few selectors that target <body> class toggles
+    cssText = cssText.replace(/body\.show-chatbot/g, `#${WIDGET_ROOT_ID}.show`);
+    cssText = cssText.replace(/body\.show-emoji-picker/g, `#${WIDGET_ROOT_ID}.show-emoji-picker`);
+
+    // Generic prefixing of rule selectors (skip @ rules).
+    return cssText.replace(/(^|\})\s*([^@}{][^{]+)/g, (match, brace, selectors) => {
+      if (selectors.trim().startsWith("@")) return match; // keep @media / keyframes intact
+      const scoped = selectors
+        .split(",")
+        .map(s => {
+          s = s.trim();
+          // Don\'t double-prefix if already scoped
+          if (s.startsWith(`#${WIDGET_ROOT_ID}`)) return s;
+          return `#${WIDGET_ROOT_ID} ${s}`;
+        })
+        .join(", ");
+      return `${brace} ${scoped}`;
+    });
+  }
+
+  // -------------------------------
+  // 3. Helper injection functions
+  // -------------------------------
+  function injectStyle() {
+    if (document.getElementById("embedded-chatbot-style")) return;
+    const style = document.createElement("style");
+    style.id = "embedded-chatbot-style";
+    style.textContent = `
+    ${scopeCss(css)}
+      @media screen and (max-width: 600px) {
+        #${WIDGET_ROOT_ID} .chatbot-popup {
+          position: fixed !important;
+          width: 100% !important;
+          height: 100% !important;
+          max-height: 100% !important;
+          right: 0 !important;
+          bottom: 0 !important;
+          border-radius: 0 !important;
+          margin: 0 !important;
+        }
+        
+        #${WIDGET_ROOT_ID} .chat-body {
+          height: calc(100% - 120px) !important;
+        }
+        
+        #${WIDGET_ROOT_ID} .chat-footer {
+          position: fixed !important;
+          bottom: 0 !important;
+          width: 100% !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function injectFontLinks() {
+    if (!document.getElementById("material-symbol-font")) {
+      const link = document.createElement("link");
+      link.id = "material-symbol-font";
+      link.rel = "stylesheet";
+      link.href = "https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,1,0";
+      document.head.appendChild(link);
+    }
+  }
+
+  function injectMarkup() {
+    if (document.getElementById(WIDGET_ROOT_ID)) return; // Already injected
+    const container = document.createElement("div");
+    container.id = WIDGET_ROOT_ID;
+    container.innerHTML = markup;
+    document.body.appendChild(container);
+  }
+
+  function loadEmojiMart() {
+    return new Promise((resolve) => {
+      if (window.EmojiMart) return resolve();
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js";
+      script.async = true;
+      script.onload = () => resolve();
+      document.head.appendChild(script);
+    });
+  }
+
+  function loadMarkdownLib() {
+    return new Promise(res => {
+      if (window.marked) return res();
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/marked@15.0.12/lib/marked.umd.min.js';
+      s.onload = res;
+      document.head.appendChild(s);
+    });
+  }
+
+  // EmailJS loader
+  function loadEmailJS() {
+    return new Promise(res => {
+      if (window.emailjs) return res();
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js';
+      s.onload = () => {
+        if (window.emailjs?.init) {
+          const publicKey = window.ChatbotWidgetConfig?.emailJsUserId || 'YOUR_PUBLIC_KEY';
+          window.emailjs.init(publicKey);
+        }
+        res();
+      };
+      document.head.appendChild(s);
+    });
+  }
+
+  // Google Identity Services loader
+  function loadGoogleAuth() {
+    return new Promise(res => {
+      if (window.google?.accounts?.id) return res();
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = res;
+      document.head.appendChild(s);
+    });
+  }
+  
+  function verifyToken(token) {
+    return new Promise(async (resolve) => {
+      const res = await fetch(`${window.ChatbotWidgetConfig?.backendBaseUrl}/verify-token`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || data.message || 'Authentication failed');
+      console.log("User Verified: ", data.user.email);
+      resolve(data.user);
+    });
+  }
+  
+  // Ensure the user is authenticated before using the chatbot
+  function ensureAuthenticated() {
+    return new Promise(async (resolve) => {
+      const stored = localStorage.getItem('chatbotAuthToken');
+      if (stored) {
+        const user = await verifyToken(stored);
+        if (user) return resolve(stored);
+        else {
+          localStorage.removeItem('chatbotAuthToken');
+        }
+      }
+
+      // Build overlay markup
+      const overlay = document.createElement('div');
+      overlay.className = 'chatbot-auth-overlay';
+      overlay.innerHTML = `
+        <div class="auth-modal">
+          <h3>Sign in to continue</h3>
+          <div id="g_id_signin"></div>
+        </div>`;
+      document.body.appendChild(overlay);
+
+      const clientId = window.ChatbotWidgetConfig?.googleClientId || 'YOUR_GOOGLE_CLIENT_ID';
+      const backendBase = window.ChatbotWidgetConfig?.backendBaseUrl || '';
+
+      // Initialize Google identity
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: async (response) => {
+          try {
+            // Exchange credential with backend
+            const res = await fetch(`${backendBase}/google-login`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ code: response.credential })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || data.message || 'Authentication failed');
+
+            const token = data.token || data.result?.token;
+            if (!token) throw new Error('Token missing in server response');
+
+            localStorage.setItem('chatbotAuthToken', token);
+            overlay.remove();
+            resolve(token);
+          } catch (err) {
+            console.error(err);
+            overlay.querySelector('h3').textContent = err.message || 'Login failed, please try again';
+          }
+        }
+      });
+
+      // Render the sign-in button
+      window.google.accounts.id.renderButton(document.getElementById('g_id_signin'), {
+        theme: 'outline',
+        size: 'large'
+      });
+
+      window.google.accounts.id.prompt();
+    });
+  }
+
+  // Helper: check stored JWT validity
+  function getStoredToken() {
+    const token = localStorage.getItem('chatbotAuthToken');
+    if (!token) return null;
+    try {
+      const payloadBase64 = token.split('.')[1];
+      const payload = JSON.parse(atob(payloadBase64));
+      if (!payload.exp || payload.exp * 1000 < Date.now()) {
+        localStorage.removeItem('chatbotAuthToken');
+        return null;
+      }
+      return token;
+    } catch (e) {
+      localStorage.removeItem('chatbotAuthToken');
+      return null;
+    }
+  }
+
+  // Generate a per-page session id using UUID and expose globally
+  const SESSION_ID = crypto.randomUUID();
+  window.ChatbotSessionId = SESSION_ID;
+
+  // -------------------------------
+  // 4. Main chatbot logic
+  // -------------------------------
+  function initLogic() {
+    const root = document.getElementById(WIDGET_ROOT_ID);
+    const chatBody = root.querySelector(".chat-body");
+    const messageInput = root.querySelector(".message-input");
+    const sendMessageButton = root.querySelector("#send-message");
+    const chatbotToggler = root.querySelector("#chatbot-toggler");
+    const closeChatbot = root.querySelector("#close-chatbot");
+    const chatForm = root.querySelector(".chat-form");
+
+    const STREAM_URL = `${window.ChatbotWidgetConfig?.backendBaseUrl}/chatbot-response/stream`;
+
+    const userData = {
+      message: null,
+      file: {
+        data: null,
+        mime_type: null,
+      },
+    };
+
+    const chatHistory = [];
+    const initialInputHeight = messageInput.scrollHeight;
+
+    const createMessageElement = (content, ...classes) => {
+      const div = document.createElement("div");
+      div.classList.add("message", ...classes);
+      div.innerHTML = content;
+      return div;
+    };
+
+    function parseSSEEvents(buffer) {
+      const events = [];
+      const blocks = buffer.split("\n\n");
+      const remainder = blocks.pop();
+      for (const block of blocks) {
+        if (!block.trim()) continue;
+        let eventType = "";
+        let eventData = "";
+        for (const line of block.split("\n")) {
+          if (line.startsWith("event: ")) eventType = line.slice(7).trim();
+          else if (line.startsWith("data: ")) eventData = line.slice(6);
+        }
+        if (eventType && eventData) {
+          try { events.push({ type: eventType, data: JSON.parse(eventData) }); }
+          catch { /* skip malformed JSON */ }
+        }
+      }
+      return { events, remainder };
+    }
+
+    function insertBookingUI(chatBody, incomingMessageDiv, messageElement) {
+      const iframeWrapper = document.createElement("div");
+      iframeWrapper.classList.add("calendly-embed-wrapper");
+      iframeWrapper.innerHTML =
+        `<iframe src="${window.ChatbotWidgetConfig?.calendlyUrl}" style="width: 100%; min-width: 400px; height: 600px; border:none;" frameborder="0"></iframe>`;
+      chatBody.insertBefore(iframeWrapper, incomingMessageDiv);
+      messageElement.textContent = "Select schedule from above";
+    }
+
+    function insertHandoffUI(chatBody, incomingMessageDiv, messageElement, ticketUuid) {
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("support-form-wrapper");
+      wrapper.innerHTML = `
+        <form class="support-form" style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+          <label style="display: block; margin-bottom: 10px;">Name*<input type="text" name="name" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px;" /></label>
+          <label style="display: block; margin-bottom: 10px;">Email*<input type="email" name="email" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px;" /></label>
+          <label style="display: block; margin-bottom: 10px;">Phone<input type="tel" name="phone" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px;" /></label>
+          <label style="display: block; margin-bottom: 10px;">Message / Issue*<textarea name="message" rows="3" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px;"></textarea></label>
+          <label style="display: block; margin-bottom: 10px;">Priority<select name="priority" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px;">
+              <option value="Low">Low</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="High">High</option>
+              <option value="Urgent">Urgent</option>
+          </select></label>
+          <button type="submit" style="background-color: ${colors.primary}; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer;">Submit</button>
+        </form>`;
+
+      chatBody.insertBefore(wrapper, incomingMessageDiv);
+      messageElement.textContent = "Please fill out the form above to talk to a human agent.";
+
+      const form = wrapper.querySelector(".support-form");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
+        const payload = {
+          name: fd.get("name"),
+          email: fd.get("email"),
+          phone: fd.get("phone") || "N/A",
+          message: fd.get("message"),
+          priority: fd.get("priority"),
+          ticket_uuid: ticketUuid,
+        };
+        try {
+          await emailjs.send(
+            window.ChatbotWidgetConfig?.emailJsServiceId || 'YOUR_SERVICE_ID',
+            window.ChatbotWidgetConfig?.emailJsSupportTemplateId || 'SUPPORT_TEMPLATE_ID',
+            payload
+          );
+          messageElement.textContent = `Thank you! Your ticket (${ticketUuid}) has been created. Our support team will reach out to you at ${payload.email}.`;
+          wrapper.remove();
+        } catch (err) {
+          console.error(err);
+          messageElement.textContent = "Failed to submit your request. Please try again later.";
+          messageElement.style.color = "#ff0000";
+        }
+      });
+    }
+
+    const generateBotResponse = async (incomingMessageDiv) => {
+      const messageElement = incomingMessageDiv.querySelector(".message-text");
+
+      chatHistory.push({
+        role: "user",
+        content: userData.message,
+        timestamp: new Date().toISOString(),
+      });
+
+      try {
+        const response = await fetch(STREAM_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${getStoredToken()}`,
+          },
+          body: JSON.stringify({
+            chat_history: chatHistory,
+            message: userData.message,
+            session_id: SESSION_ID,
+            website_url: window.ChatbotWidgetConfig?.hostUrl || "",
+            website_description: window.ChatbotWidgetConfig?.hostDescription || "",
+          }),
+        });
+
+        if (!response.ok) {
+          let errMsg = "Error";
+          try { const d = await response.json(); errMsg = d.detail || errMsg; } catch {}
+          throw new Error(errMsg);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let fullResponse = "";
+        let displayedLen = 0;
+        let isBooking = false;
+        let isHandoff = false;
+        let ticketUuid = null;
+        let streamDone = false;
+
+        const CHAR_DELAY = 18;
+        let typingTimer = null;
+
+        function startTyping() {
+          if (typingTimer) return;
+          typingTimer = setInterval(() => {
+            if (displayedLen < fullResponse.length) {
+              displayedLen++;
+              messageElement.innerHTML = marked.parse(fullResponse.slice(0, displayedLen));
+              chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: "smooth" });
+            } else if (streamDone) {
+              clearInterval(typingTimer);
+              typingTimer = null;
+              messageElement.innerHTML = marked.parse(fullResponse);
+              incomingMessageDiv.classList.remove("streaming");
+            }
+          }, CHAR_DELAY);
+        }
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const { events, remainder } = parseSSEEvents(buffer);
+          buffer = remainder;
+
+          for (const evt of events) {
+            switch (evt.type) {
+              case "intent":
+                if (evt.data.type === "regular") {
+                  incomingMessageDiv.classList.remove("thinking");
+                  incomingMessageDiv.classList.add("streaming");
+                  messageElement.innerHTML = "";
+                  startTyping();
+                }
+                break;
+
+              case "token":
+                fullResponse += evt.data.text;
+                break;
+
+              case "action":
+                incomingMessageDiv.classList.remove("thinking");
+                incomingMessageDiv.classList.remove("streaming");
+                if (evt.data.type === "booking") {
+                  isBooking = true;
+                  fullResponse = evt.data.response || "";
+                  insertBookingUI(chatBody, incomingMessageDiv, messageElement);
+                } else if (evt.data.type === "handoff") {
+                  isHandoff = true;
+                  fullResponse = evt.data.response || "";
+                  ticketUuid = evt.data.ticket_uuid || null;
+                  insertHandoffUI(chatBody, incomingMessageDiv, messageElement, ticketUuid);
+                }
+                break;
+
+              case "done":
+                isBooking = evt.data.is_booking || false;
+                isHandoff = evt.data.is_human_handoff || false;
+                if (evt.data.ticket_uuid) ticketUuid = evt.data.ticket_uuid;
+                streamDone = true;
+                break;
+
+              case "error":
+                incomingMessageDiv.classList.remove("streaming");
+                if (typingTimer) { clearInterval(typingTimer); typingTimer = null; }
+                throw new Error(evt.data.message || "Something went wrong");
+            }
+          }
+        }
+
+        streamDone = true;
+        await new Promise((resolve) => {
+          const flush = setInterval(() => {
+            if (displayedLen >= fullResponse.length || !typingTimer) {
+              clearInterval(flush);
+              if (typingTimer) { clearInterval(typingTimer); typingTimer = null; }
+              if (fullResponse) messageElement.innerHTML = marked.parse(fullResponse);
+              incomingMessageDiv.classList.remove("streaming");
+              resolve();
+            }
+          }, 50);
+        });
+
+        chatHistory.push({
+          role: "model",
+          content: fullResponse,
+          timestamp: new Date().toISOString(),
+          is_booking: isBooking,
+          is_human_handoff: isHandoff,
+        });
+      } catch (error) {
+        console.error(error);
+        messageElement.innerText = error.message || "Something went wrong";
+        messageElement.style.color = "#ff0000";
+      } finally {
+        incomingMessageDiv.classList.remove("thinking");
+        incomingMessageDiv.classList.remove("streaming");
+        chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: "smooth" });
+      }
+    };
+
+    // Handle outgoing message
+    const handleOutgoingMessage = (e) => {
+      e.preventDefault();
+      userData.message = messageInput.value.trim();
+      if (!userData.message) return;
+      messageInput.value = "";
+      messageInput.dispatchEvent(new Event("input"));
+
+      const messageContent = `<div class="message-text"></div>`;
+      const outgoingMessageDiv = createMessageElement(messageContent, "user-message");
+      outgoingMessageDiv.querySelector(".message-text").textContent = userData.message;
+      chatBody.appendChild(outgoingMessageDiv);
+      chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: "smooth" });
+
+      setTimeout(() => {
+        const thinkingContent = `<svg class="bot-avatar" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 1024 1024"><path d="M738.3 287.6H285.7c-59 0-106.8 47.8-106.8 106.8v303.1c0 59 47.8 106.8 106.8 106.8h81.5v111.1c0 .7.8 1.1 1.4.7l166.9-110.6 41.8-.8h117.4l43.6-.4c59 0 106.8-47.8 106.8-106.8V394.5c0-59-47.8-106.9-106.8-106.9zM351.7 448.2c0-29.5 23.9-53.5 53.5-53.5s53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5-53.5-23.9-53.5-53.5zm157.9 267.1c-67.8 0-123.8-47.5-132.3-109h264.6c-8.6 61.5-64.5 109-132.3 109zm110-213.7c-29.5 0-53.5-23.9-53.5-53.5s23.9-53.5 53.5-53.5 53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5zM867.2 644.5V453.1h26.5c19.4 0 35.1 15.7 35.1 35.1v121.1c0 19.4-15.7 35.1-35.1 35.1h-26.5zM95.2 609.4V488.2c0-19.4 15.7-35.1 35.1-35.1h26.5v191.3h-26.5c-19.4 0-35.1-15.7-35.1-35.1zM561.5 149.6c0 23.4-15.6 43.3-36.9 49.7v44.9h-30v-44.9c-21.4-6.5-36.9-26.3-36.9-49.7 0-28.6 23.3-51.9 51.9-51.9s51.9 23.3 51.9 51.9z"></path></svg><div class="message-text"><div class="thinking-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+        const incomingMessageDiv = createMessageElement(thinkingContent, "bot-message", "thinking");
+        chatBody.appendChild(incomingMessageDiv);
+        chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: "smooth" });
+        generateBotResponse(incomingMessageDiv);
+      }, 600);
+    };
+
+    // Listeners
+    messageInput.addEventListener("keydown", (e) => {
+      const userMessage = e.target.value.trim();
+      if (e.key === "Enter" && userMessage && !e.shiftKey && window.innerWidth > 768) {
+        handleOutgoingMessage(e);
+      }
+    });
+
+    messageInput.addEventListener("input", () => {
+      messageInput.style.height = `${initialInputHeight}px`;
+      messageInput.style.height = `${messageInput.scrollHeight}px`;
+      chatForm.style.borderRadius = messageInput.scrollHeight > initialInputHeight ? "15px" : "32px";
+    });
+
+    chatForm.addEventListener("submit", handleOutgoingMessage);
+    sendMessageButton.addEventListener("click", handleOutgoingMessage);
+
+    chatbotToggler.addEventListener("click", async () => {
+      if (!getStoredToken()) {
+        await loadGoogleAuth();
+      }
+      const token = await ensureAuthenticated();
+      if (!token) return; // user cancelled or failed
+      root.classList.toggle("show");
+    });
+
+    closeChatbot.addEventListener("click", () => {
+      root.classList.remove("show");
+    });
+
+    // Emoji picker
+    const picker = new EmojiMart.Picker({
+      theme: "light",
+      skinTonePosition: "none",
+      preview: "none",
+      onEmojiSelect: (emoji) => {
+        const { selectionStart: start, selectionEnd: end } = messageInput;
+        messageInput.setRangeText(emoji.native, start, end, "end");
+        messageInput.focus();
+      },
+      onClickOutside: (e) => {
+        if (e.target.id === "emoji-picker") {
+          root.classList.toggle("show-emoji-picker");
+        } else {
+          root.classList.remove("show-emoji-picker");
+        }
+      },
+    });
+
+    root.querySelector(".chat-form").appendChild(picker);
+  }
+
+  // -------------------------------
+  // 5. Bootstrap sequence
+  // -------------------------------
+  async function bootstrap() {
+    injectStyle();
+    injectFontLinks();
+    injectMarkup();
+    // Load core libraries (Google auth will be loaded on demand)
+    await Promise.all([loadEmojiMart(), loadMarkdownLib(), loadEmailJS()]);
+    initLogic();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootstrap);
+  } else {
+    bootstrap();
+  }
+})();
