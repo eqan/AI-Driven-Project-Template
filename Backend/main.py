@@ -1,5 +1,13 @@
+import sys
+from pathlib import Path
+
 import uvicorn
-from app.config.settings import settings
+
+APP_DIR = Path(__file__).resolve().parent / "app"
+if str(APP_DIR) not in sys.path:
+    sys.path.insert(0, str(APP_DIR))
+
+from config.settings import settings
 
 if __name__ == "__main__":
     runtime_server = settings.runtime.server
