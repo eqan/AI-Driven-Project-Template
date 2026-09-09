@@ -10,8 +10,8 @@ export const title = tv({
     },
     size: {
       sm: "text-3xl sm:text-4xl",
-      md: "text-[2.2rem] sm:text-4xl",
-      lg: "text-4xl sm:text-5xl xl:text-[3.9rem]",
+      md: "text-3xl sm:text-[2.6rem]",
+      lg: "text-4xl sm:text-[2.9rem] xl:text-[3.2rem]",
     },
   },
   defaultVariants: {
@@ -21,7 +21,7 @@ export const title = tv({
 });
 
 export const subtitle = tv({
-  base: "my-2 block w-full max-w-full text-base leading-7 text-muted lg:text-[1.05rem]",
+  base: "my-2 block w-full max-w-full text-base leading-7 text-muted",
   variants: {
     fullWidth: {
       true: "!w-full",

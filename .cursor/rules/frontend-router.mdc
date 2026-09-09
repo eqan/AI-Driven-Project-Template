@@ -29,6 +29,9 @@ For frontend feature requests, the parent instructions include a clarification-f
 - default to safer frontend persistence: do not drop secrets into browser storage and be explicit about cache freshness for each new data surface
 - treat browser caching as a product decision with scenarios: `no-store` for auth and user-sensitive data, short-lived or focus-based revalidation for dashboards and search, and longer caching only for public reference content
 - for public-facing SaaS pages, prefer a predictable structure with clear hero, proof, product demo, stepwise explanation, and repeated CTA rather than one-off layout experiments
+- for protected app surfaces, default to a familiar top-nav SaaS shell, compact headers, light neutral surfaces, and practical page flow over showcase-style layouts
+- keep selected navigation states on the theme accent with high-contrast text, usually white, instead of dark text on a saturated chip
+- avoid persistent sidebars and heavy decorative chrome unless the workflow clearly benefits from them
 - commit to a clear aesthetic direction and avoid generic AI-generated frontend patterns
 - self-review hierarchy, spacing, states, and mobile fit before finishing
 - verify with lint, typecheck, and build

@@ -26,15 +26,15 @@ export function Navbar() {
   }
 
   return (
-    <nav className="sticky top-4 z-40">
-      <header className="flex items-center gap-4 rounded-[24px] border border-[var(--line-strong)] bg-[var(--surface-strong)] px-4 py-4 shadow-[0_14px_44px_rgba(2,6,23,0.14)] sm:px-5">
-        <div className="flex min-w-0 items-center gap-4 lg:hidden">
+    <nav className="sticky top-0 z-40 border-b border-[var(--line)] bg-[rgba(248,250,252,0.9)] backdrop-blur">
+      <header className="mx-auto flex w-full max-w-6xl items-center gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-4 md:hidden">
           <NextLink className="flex items-center gap-3" href="/">
-            <span className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-2 text-accent">
+            <span className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2 text-accent">
               <Logo size={20} />
             </span>
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-accent/80">
+              <p className="text-sm font-semibold text-foreground">
                 {siteConfig.name}
               </p>
               <p className="text-sm text-muted">{siteConfig.productTagline}</p>
@@ -42,34 +42,42 @@ export function Navbar() {
           </NextLink>
         </div>
 
-        <div className="hidden min-w-0 items-center gap-2 md:flex lg:hidden">
-          {siteConfig.navItems.map((item) => {
-            return (
-              <NextLink
-                key={item.href}
-                className={clsx(
-                  "rounded-2xl px-4 py-2 text-sm transition-colors",
-                  isActivePath(item.href)
-                    ? "bg-[var(--surface)] text-foreground"
-                    : "text-muted hover:text-foreground",
-                )}
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            );
-          })}
+        <div className="hidden min-w-0 items-center gap-8 md:flex">
+          <NextLink className="flex items-center gap-3" href="/">
+            <span className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2 text-accent">
+              <Logo size={20} />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-foreground">{siteConfig.name}</p>
+              <p className="text-sm text-muted">{siteConfig.productTagline}</p>
+            </div>
+          </NextLink>
+
+          <div className="flex items-center gap-1 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-1">
+            {siteConfig.navItems.map((item) => {
+              return (
+                <NextLink
+                  key={item.href}
+                  className={clsx(
+                    "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+                    isActivePath(item.href)
+                      ? "bg-accent text-white shadow-[0_8px_22px_rgba(79,141,247,0.28)]"
+                      : "text-muted hover:bg-[var(--surface-strong)] hover:text-foreground",
+                  )}
+                  href={item.href}
+                >
+                  {item.label}
+                </NextLink>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="ml-auto hidden items-center gap-3 sm:flex">
-          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-            Protected workspace
-          </div>
-
+        <div className="ml-auto hidden items-center gap-3 md:flex">
           {user ? (
             <>
-              <div className="flex items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2">
-                <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-accent/20 text-sm font-semibold text-foreground">
+              <div className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2">
+                <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-accent/10 text-sm font-semibold text-foreground">
                   {user.picture ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -90,7 +98,7 @@ export function Navbar() {
                 </div>
               </div>
               <button
-                className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-white/10"
+                className="rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-[var(--surface-strong)]"
                 onClick={handleSignOut}
                 type="button"
               >
@@ -98,13 +106,13 @@ export function Navbar() {
               </button>
             </>
           ) : (
-            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm text-muted">
+            <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm text-muted">
               {status === "loading" ? "Restoring session" : "Account unavailable"}
             </div>
           )}
         </div>
 
-        <div className="ml-auto flex items-center gap-2 sm:hidden">
+        <div className="ml-auto flex items-center gap-2 md:hidden">
           <button
             aria-expanded={isMenuOpen}
             aria-label="Toggle menu"
@@ -138,41 +146,43 @@ export function Navbar() {
       </header>
 
       {isMenuOpen ? (
-        <div className="mt-3 rounded-[24px] border border-[var(--line-strong)] bg-[var(--surface-strong)] px-4 pb-4 pt-4 shadow-[0_14px_44px_rgba(2,6,23,0.14)] sm:hidden">
-          <div className="flex flex-col gap-2">
+        <div className="border-t border-[var(--line)] bg-[rgba(248,250,252,0.98)] px-4 py-4 md:hidden">
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-2">
             {siteConfig.navItems.map((item) => {
               return (
                 <NextLink
                   key={item.href}
                   className={clsx(
-                    "rounded-2xl px-4 py-3 text-sm transition-colors",
+                    "rounded-xl px-4 py-3 text-sm transition-colors",
                     isActivePath(item.href)
-                      ? "bg-[var(--surface)] text-foreground"
-                      : "text-muted hover:text-foreground",
+                      ? "bg-accent text-white"
+                      : "border border-[var(--line)] bg-[var(--surface)] text-foreground",
                   )}
                   href={item.href}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <span className="block font-semibold text-foreground">{item.label}</span>
-                  <span className="mt-1 block text-sm text-muted">{item.description}</span>
+                  <span className="block font-semibold">{item.label}</span>
+                  <span className={clsx("mt-1 block text-sm", isActivePath(item.href) ? "text-white/85" : "text-muted")}>
+                    {item.description}
+                  </span>
                 </NextLink>
               );
             })}
 
             {user ? (
-              <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3">
+              <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3">
                 <p className="text-sm font-medium text-foreground">{user.name}</p>
                 <p className="mt-1 text-xs text-muted">{user.email}</p>
               </div>
             ) : (
-              <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm text-muted">
+              <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm text-muted">
                 {status === "loading" ? "Restoring session" : "Account unavailable"}
               </div>
             )}
 
             {user ? (
               <button
-                className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-left text-sm font-semibold text-foreground"
+                className="rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-left text-sm font-semibold text-foreground"
                 onClick={handleSignOut}
                 type="button"
               >

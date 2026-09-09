@@ -11,7 +11,7 @@ type BackendDomainTableProps = {
 export function BackendDomainTable({ domains }: BackendDomainTableProps) {
   return (
     <Table
-      className="rounded-3xl border border-[var(--line)] bg-[var(--surface)] shadow-[0_14px_44px_rgba(2,6,23,0.12)]"
+      className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] shadow-[0_10px_28px_rgba(15,23,42,0.05)]"
       variant="secondary"
     >
       <Table.ScrollContainer className="w-full">

@@ -9,32 +9,28 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(84,122,255,0.28),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(242,163,90,0.16),transparent_26%)]" />
-
-      <header className="mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6">
-        <NextLink className="inline-flex items-center gap-3" href="/">
-          <span className="rounded-2xl border border-white/12 bg-white/6 p-2 text-accent shadow-[0_18px_50px_rgba(48,88,255,0.22)]">
+    <div className="flex min-h-screen flex-col">
+      <header className="border-b border-[var(--line)] bg-[rgba(248,250,252,0.9)] backdrop-blur">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+          <NextLink className="inline-flex items-center gap-3" href="/">
+            <span className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2 text-accent">
             <Logo size={22} />
-          </span>
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-accent/80">
-              {siteConfig.name}
-            </p>
-            <p className="text-sm text-muted">{siteConfig.productTagline}</p>
-          </div>
-        </NextLink>
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-foreground">{siteConfig.name}</p>
+              <p className="text-sm text-muted">{siteConfig.productTagline}</p>
+            </div>
+          </NextLink>
+
+          <p className="rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 text-xs font-medium text-muted">
+            Secure access
+          </p>
+        </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-1 px-4 pb-10 pt-6 sm:px-6">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 px-4 pb-12 pt-10 sm:px-6 lg:px-8">
         {children}
       </main>
-
-      <footer className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6">
-        <p className="text-xs font-medium tracking-[0.08em] text-muted">
-          Secure workspace access
-        </p>
-      </footer>
     </div>
   );
 }

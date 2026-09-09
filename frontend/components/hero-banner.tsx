@@ -34,16 +34,16 @@ export function HeroBanner({
   asideDescription,
 }: HeroBannerProps) {
   return (
-    <section className="overflow-hidden rounded-[30px] border border-[var(--line-strong)] bg-[linear-gradient(180deg,var(--surface-strong),var(--surface))] p-6 shadow-[0_18px_56px_rgba(2,6,23,0.16)] sm:p-8 lg:p-9">
-      <div className="grid gap-8 xl:grid-cols-[1.2fr_0.8fr] xl:items-start">
-        <div className="space-y-6">
+    <section className="overflow-hidden rounded-[28px] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_16px_44px_rgba(15,23,42,0.06)] sm:p-8">
+      <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr] xl:items-start">
+        <div className="space-y-5">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent/75">
             {eyebrow}
           </p>
 
           <div className="max-w-3xl space-y-3">
             <h1 className={title({ size: "lg", color: "foreground" })}>{heading}</h1>
-            <p className={subtitle({ class: "max-w-2xl text-base lg:text-base" })}>
+            <p className={subtitle({ class: "max-w-2xl" })}>
               {description}
             </p>
           </div>
@@ -55,8 +55,8 @@ export function HeroBanner({
                   key={action.href}
                   className={
                     action.variant === "secondary"
-                      ? "rounded-2xl border border-[var(--line-strong)] bg-[var(--surface-strong)] px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-white/10"
-                      : "rounded-2xl bg-accent px-4 py-2.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-accent/90"
+                      ? "rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-[var(--surface-strong)]"
+                      : "rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
                   }
                   href={action.href}
                 >
@@ -68,7 +68,7 @@ export function HeroBanner({
         </div>
 
         {asideTitle || asideDescription ? (
-          <aside className="rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-5">
+          <aside className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-5">
             {asideTitle ? (
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent/75">
                 {asideTitle}
@@ -86,7 +86,7 @@ export function HeroBanner({
           {metrics.map((metric) => (
             <article
               key={metric.label}
-              className="rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-5"
+              className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-5"
             >
               <p className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
                 {metric.value}

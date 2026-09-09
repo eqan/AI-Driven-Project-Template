@@ -7,13 +7,13 @@ import { siteConfig } from "@/config/site";
 export default function HomePage() {
   return (
     <section className="flex w-full flex-col gap-8">
-      <section className="rounded-[30px] border border-[var(--line-strong)] bg-[linear-gradient(180deg,var(--surface-strong),var(--surface))] p-6 shadow-[0_18px_56px_rgba(2,6,23,0.16)] sm:p-8">
+      <section className="rounded-[28px] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_16px_44px_rgba(15,23,42,0.06)] sm:p-8">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent/75">
               Workspace
             </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-foreground sm:text-4xl xl:text-[3.25rem]">
+            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-foreground sm:text-4xl">
               Operate the product from one predictable shell.
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-muted sm:text-base">
@@ -27,7 +27,7 @@ export default function HomePage() {
             {siteConfig.quickLinks.slice(0, 2).map((link) => (
               <NextLink
                 key={link.href}
-                className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-4 transition-colors hover:bg-[var(--surface-strong)]"
+                className="rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-4 transition-colors hover:bg-slate-50"
                 href={link.href}
               >
                 <p className="text-sm font-semibold text-foreground">{link.label}</p>
@@ -41,7 +41,7 @@ export default function HomePage() {
           {siteConfig.proofMetrics.map((metric) => (
             <article
               key={metric.label}
-              className="rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-5"
+              className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-5"
             >
               <p className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
                 {metric.value}
@@ -69,7 +69,7 @@ export default function HomePage() {
         title="Execution lanes and browser-state decisions."
       >
         <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-          <div className="rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_14px_44px_rgba(2,6,23,0.12)]">
+          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent/75">
                 Delivery order
@@ -82,7 +82,7 @@ export default function HomePage() {
               {siteConfig.deliveryTracks.map((track) => (
                 <div
                   key={track.title}
-                  className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4"
+                  className="rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] p-4"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <h3 className="text-base font-semibold text-foreground">{track.title}</h3>
@@ -96,7 +96,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_14px_44px_rgba(2,6,23,0.12)]">
+          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent/75">
                 Cache posture
@@ -109,7 +109,7 @@ export default function HomePage() {
               {siteConfig.cacheScenarios.map((scenario) => (
                 <article
                   key={scenario.title}
-                  className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4"
+                  className="rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] p-4"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <h3 className="text-base font-semibold text-foreground">{scenario.title}</h3>

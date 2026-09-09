@@ -13,7 +13,7 @@ export function FullPageState({
 }: FullPageStateProps) {
   return (
     <div className="flex min-h-[calc(100vh-2rem)] items-center justify-center px-4 py-10 sm:px-6">
-      <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.025))] p-8 text-center shadow-[0_30px_120px_rgba(10,14,28,0.28)] backdrop-blur-xl">
+      <div className="w-full max-w-xl rounded-[28px] border border-[var(--line)] bg-[var(--surface)] p-8 text-center shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent/85">
           {eyebrow}
         </p>

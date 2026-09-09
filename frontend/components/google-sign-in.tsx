@@ -189,35 +189,35 @@ export function GoogleSignIn() {
       />
 
       <div className="space-y-4">
-        <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.055),rgba(255,255,255,0.02))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-5">
+        <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] p-4 sm:p-5">
           <p className="text-sm leading-6 text-muted">
             Google is the configured sign-in method for this workspace.
           </p>
 
-          <div className="mt-4 rounded-[20px] border border-white/8 bg-black/12 p-3 dark:bg-white/4 sm:p-4">
+          <div className="mt-4 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-3 sm:p-4">
             <div
               className="min-h-[44px] w-full max-w-[360px]"
               ref={buttonRef}
             />
 
             {!isScriptReady && !missingConfigError ? (
-              <div className="mt-3 h-11 max-w-[360px] animate-pulse rounded-[14px] border border-white/8 bg-white/6" />
+              <div className="mt-3 h-11 max-w-[360px] animate-pulse rounded-xl border border-[var(--line)] bg-slate-100" />
             ) : null}
           </div>
         </div>
 
         {isSubmitting ? (
-          <div className="rounded-[20px] border border-white/10 bg-white/6 px-4 py-3 text-sm text-foreground">
+          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm text-foreground">
             Finishing sign-in and verifying your session...
           </div>
         ) : status === "loading" ? (
-          <div className="rounded-[20px] border border-white/10 bg-white/6 px-4 py-3 text-sm text-muted">
+          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm text-muted">
             Checking whether you already have an active session...
           </div>
         ) : null}
 
         {activeError ? (
-          <div className="rounded-[20px] border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm leading-6 text-red-100">
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
             {activeError}
           </div>
         ) : null}

@@ -6,7 +6,7 @@ type ListPanelProps = {
 
 export function ListPanel({ eyebrow, title, items }: ListPanelProps) {
   return (
-    <article className="rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_14px_44px_rgba(2,6,23,0.12)]">
+    <article className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
       <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent/75">
         {eyebrow}
       </p>
@@ -18,7 +18,7 @@ export function ListPanel({ eyebrow, title, items }: ListPanelProps) {
         {items.map((item) => (
           <div
             key={item}
-            className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-4 text-sm leading-6 text-muted"
+            className="rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-4 text-sm leading-6 text-muted"
           >
             {item}
           </div>

@@ -70,7 +70,7 @@ export default function PlaybookPage() {
             title="Start with a clear bar for usefulness."
           />
 
-          <article className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.025))] p-6 shadow-[0_24px_95px_rgba(7,10,20,0.18)] backdrop-blur">
+          <article className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent/80">
               Verification loop
             </p>
@@ -81,7 +81,7 @@ export default function PlaybookPage() {
               {siteConfig.deliveryTracks.map((track) => (
                 <div
                   key={track.title}
-                  className="rounded-[22px] border border-white/10 bg-black/10 px-4 py-4 dark:bg-white/4"
+                  className="rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-4"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="text-sm font-semibold text-foreground">{track.title}</h3>

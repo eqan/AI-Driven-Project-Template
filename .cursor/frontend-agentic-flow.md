@@ -108,6 +108,7 @@ If the user is unsure, recommend a concrete screen structure and request/respons
 
 - preserve one coherent visual language
 - prefer reusable sections over one-off layouts
+- prefer familiar product patterns over clever layout experiments unless the user explicitly asks for novelty
 - avoid generic template filler once the project direction is known
 - treat this repository as a SaaS application workspace by default, even when the content is still sparse
 - for time-boxed product work, avoid marketing copy, explanatory panels, and oversized placeholder content
@@ -181,6 +182,29 @@ Pattern defaults:
 - avoid nested cards and repeated equal-width marketing-card grids as a default pattern
 - avoid stock-looking AI visuals or gradients used only to signal "AI"
 
+## Practical SaaS Shell Defaults
+
+For in-app workspace surfaces, dashboards, CRUD flows, settings, docs, and internal product pages:
+
+- default to a familiar top navigation bar for stable top-level product areas
+- keep navigation simple: brand on the left, route tabs in the middle when appropriate, account and utility actions on the right
+- prefer a compact summary strip or page header under the navbar instead of a persistent left rail by default
+- use sidebars only when the information density truly requires them; do not add a left sidebar just to fill space
+- let the main content area carry the page purpose while product chrome stays quiet and supportive
+- keep layouts content-first: primary task, supporting data, secondary actions
+- favor white or near-white surfaces, soft borders, restrained shadows, and one clear accent color for the light theme baseline
+- use blue accents in a softer practical range rather than very dark saturated blocks that overpower a light shell
+- selected navigation states should use the theme accent itself, with high-contrast text such as white on the active tab
+- do not leave dark text on a strong accent background when the selected state becomes harder to read
+- keep the visual weight of headers, chips, and tabs aligned with the global theme tokens instead of inventing local colors
+- borrow the clarity and familiarity of fast-moving SaaS products like Marc Lou's, but do not copy branding, wording, or identity
+
+## App Shell Vs Public Page
+
+- public marketing or onboarding pages can use stronger storytelling, proof, and conversion structure when the user asks for it
+- protected app pages, auth routes, settings, dashboards, and operational tools should bias toward familiarity, speed, and clarity
+- when a route behaves like software, prefer product navigation, predictable sections, practical tables/forms, and short copy over hero-style composition
+
 ## Predictable SaaS Patterns
 
 For public product pages, onboarding explainers, launch pages, and founder-led SaaS surfaces, prefer a repeatable pattern language inspired by fast-moving indie products such as Marc Lou's:
@@ -196,6 +220,15 @@ For public product pages, onboarding explainers, launch pages, and founder-led S
 - make pages feel founder-operated and product-specific through concrete details, not generic startup language
 - borrow the structure and clarity, not the exact brand voice, wording, or visual identity
 - do not apply this public-page pattern to auth, settings, checkout, admin, or other utility routes unless the user explicitly asks for a marketing treatment
+
+For protected app shells and in-product workspace routes inspired by the same practicality:
+
+- prefer familiar app framing over promotional storytelling
+- keep headings concrete and shorter than on public landing pages
+- show routes, tables, filters, forms, summaries, and next actions early
+- make active navigation, account controls, and primary actions immediately obvious
+- use practical density: enough information to act, not so much chrome that the shell becomes the main event
+- if the layout choice is between expressive and familiar for an operational surface, default to familiar
 
 ## Copy Rules
 
