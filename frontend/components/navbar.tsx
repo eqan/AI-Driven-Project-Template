@@ -27,10 +27,10 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-4 z-40">
-      <header className="flex items-center gap-4 rounded-[28px] border border-white/10 bg-background/72 px-4 py-4 shadow-[0_24px_90px_rgba(7,10,20,0.18)] backdrop-blur-xl sm:px-5">
+      <header className="flex items-center gap-4 rounded-[24px] border border-[var(--line-strong)] bg-[var(--surface-strong)] px-4 py-4 shadow-[0_14px_44px_rgba(2,6,23,0.14)] sm:px-5">
         <div className="flex min-w-0 items-center gap-4 lg:hidden">
           <NextLink className="flex items-center gap-3" href="/">
-            <span className="rounded-2xl border border-white/12 bg-white/6 p-2 text-accent shadow-[0_12px_36px_rgba(48,88,255,0.18)]">
+            <span className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-2 text-accent">
               <Logo size={20} />
             </span>
             <div>
@@ -48,9 +48,9 @@ export function Navbar() {
               <NextLink
                 key={item.href}
                 className={clsx(
-                  "rounded-full px-4 py-2 text-sm transition-colors",
+                  "rounded-2xl px-4 py-2 text-sm transition-colors",
                   isActivePath(item.href)
-                    ? "bg-white/10 text-foreground"
+                    ? "bg-[var(--surface)] text-foreground"
                     : "text-muted hover:text-foreground",
                 )}
                 href={item.href}
@@ -62,13 +62,13 @@ export function Navbar() {
         </div>
 
         <div className="ml-auto hidden items-center gap-3 sm:flex">
-          <div className="rounded-full border border-white/10 bg-white/6 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted">
+          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted">
             Protected workspace
           </div>
 
           {user ? (
             <>
-              <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/6 px-3 py-2">
+              <div className="flex items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2">
                 <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-accent/20 text-sm font-semibold text-foreground">
                   {user.picture ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -90,7 +90,7 @@ export function Navbar() {
                 </div>
               </div>
               <button
-                className="rounded-full border border-white/12 bg-white/6 px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-white/10"
+                className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-white/10"
                 onClick={handleSignOut}
                 type="button"
               >
@@ -98,7 +98,7 @@ export function Navbar() {
               </button>
             </>
           ) : (
-            <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-muted">
+            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm text-muted">
               {status === "loading" ? "Restoring session" : "Account unavailable"}
             </div>
           )}
@@ -108,7 +108,7 @@ export function Navbar() {
           <button
             aria-expanded={isMenuOpen}
             aria-label="Toggle menu"
-            className="rounded-xl border border-white/10 bg-white/6 p-2 text-foreground"
+            className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2 text-foreground"
             onClick={() => setIsMenuOpen((value) => !value)}
           >
             <svg
@@ -138,7 +138,7 @@ export function Navbar() {
       </header>
 
       {isMenuOpen ? (
-        <div className="mt-3 rounded-[28px] border border-white/10 bg-background/88 px-4 pb-4 pt-4 shadow-[0_24px_90px_rgba(7,10,20,0.18)] backdrop-blur-xl sm:hidden">
+        <div className="mt-3 rounded-[24px] border border-[var(--line-strong)] bg-[var(--surface-strong)] px-4 pb-4 pt-4 shadow-[0_14px_44px_rgba(2,6,23,0.14)] sm:hidden">
           <div className="flex flex-col gap-2">
             {siteConfig.navItems.map((item) => {
               return (
@@ -147,7 +147,7 @@ export function Navbar() {
                   className={clsx(
                     "rounded-2xl px-4 py-3 text-sm transition-colors",
                     isActivePath(item.href)
-                      ? "bg-white/10 text-foreground"
+                      ? "bg-[var(--surface)] text-foreground"
                       : "text-muted hover:text-foreground",
                   )}
                   href={item.href}
@@ -160,19 +160,19 @@ export function Navbar() {
             })}
 
             {user ? (
-              <div className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3">
+              <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3">
                 <p className="text-sm font-medium text-foreground">{user.name}</p>
                 <p className="mt-1 text-xs text-muted">{user.email}</p>
               </div>
             ) : (
-              <div className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3 text-sm text-muted">
+              <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm text-muted">
                 {status === "loading" ? "Restoring session" : "Account unavailable"}
               </div>
             )}
 
             {user ? (
               <button
-                className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3 text-left text-sm font-semibold text-foreground"
+                className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-left text-sm font-semibold text-foreground"
                 onClick={handleSignOut}
                 type="button"
               >

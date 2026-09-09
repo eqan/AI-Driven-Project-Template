@@ -34,16 +34,16 @@ export function HeroBanner({
   asideDescription,
 }: HeroBannerProps) {
   return (
-    <section className="overflow-hidden rounded-[36px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(127,154,255,0.16),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.075),rgba(255,255,255,0.02))] p-6 shadow-[0_30px_120px_rgba(7,10,20,0.22)] backdrop-blur-xl sm:p-8 lg:p-10">
+    <section className="overflow-hidden rounded-[30px] border border-[var(--line-strong)] bg-[linear-gradient(180deg,var(--surface-strong),var(--surface))] p-6 shadow-[0_18px_56px_rgba(2,6,23,0.16)] sm:p-8 lg:p-9">
       <div className="grid gap-8 xl:grid-cols-[1.2fr_0.8fr] xl:items-start">
         <div className="space-y-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent/80">
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent/75">
             {eyebrow}
           </p>
 
-          <div className="max-w-4xl space-y-4">
+          <div className="max-w-3xl space-y-3">
             <h1 className={title({ size: "lg", color: "foreground" })}>{heading}</h1>
-            <p className={subtitle({ class: "max-w-2xl text-base lg:text-lg" })}>
+            <p className={subtitle({ class: "max-w-2xl text-base lg:text-base" })}>
               {description}
             </p>
           </div>
@@ -55,8 +55,8 @@ export function HeroBanner({
                   key={action.href}
                   className={
                     action.variant === "secondary"
-                      ? "rounded-full border border-white/12 bg-white/6 px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-white/10"
-                      : "rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-background transition-transform hover:-translate-y-0.5"
+                      ? "rounded-2xl border border-[var(--line-strong)] bg-[var(--surface-strong)] px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-white/10"
+                      : "rounded-2xl bg-accent px-4 py-2.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-accent/90"
                   }
                   href={action.href}
                 >
@@ -68,14 +68,14 @@ export function HeroBanner({
         </div>
 
         {asideTitle || asideDescription ? (
-          <aside className="rounded-[28px] border border-white/10 bg-black/12 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] dark:bg-white/4">
+          <aside className="rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-5">
             {asideTitle ? (
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent/80">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent/75">
                 {asideTitle}
               </p>
             ) : null}
             {asideDescription ? (
-              <p className="mt-4 text-sm leading-7 text-muted">{asideDescription}</p>
+              <p className="mt-4 text-sm leading-6 text-muted">{asideDescription}</p>
             ) : null}
           </aside>
         ) : null}
@@ -86,12 +86,12 @@ export function HeroBanner({
           {metrics.map((metric) => (
             <article
               key={metric.label}
-              className="rounded-[24px] border border-white/10 bg-black/12 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] dark:bg-white/4"
+              className="rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-5"
             >
-              <p className="text-3xl font-semibold tracking-[-0.04em] text-foreground">
+              <p className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
                 {metric.value}
               </p>
-              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.22em] text-accent/80">
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.22em] text-accent/75">
                 {metric.label}
               </p>
               <p className="mt-3 text-sm leading-6 text-muted">{metric.note}</p>

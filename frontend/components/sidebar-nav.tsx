@@ -10,7 +10,7 @@ export function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="mt-8 flex flex-col gap-2">
+    <nav className="mt-8 flex flex-col gap-1.5">
       {siteConfig.navItems.map((item) => {
         const isActive =
           item.href === "/" ? pathname === item.href : pathname.startsWith(item.href);
@@ -19,18 +19,39 @@ export function SidebarNav() {
           <NextLink
             key={item.href}
             className={clsx(
-              "rounded-[22px] border px-4 py-4 transition-colors",
+              "rounded-2xl border px-4 py-3.5 transition-all",
               isActive
-                ? "border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.06))] shadow-[0_18px_50px_rgba(7,10,20,0.12)]"
-                : "border-transparent bg-transparent hover:border-white/10 hover:bg-white/6",
+                ? "border-accent/25 bg-[linear-gradient(180deg,rgba(124,178,255,0.12),rgba(124,178,255,0.04))] shadow-[0_12px_34px_rgba(2,6,23,0.14)] ring-1 ring-accent/15"
+                : "border-transparent bg-transparent hover:border-[var(--line)] hover:bg-[var(--surface)]",
             )}
             href={item.href}
           >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent/70">
-              Route
-            </p>
-            <p className="text-sm font-semibold text-foreground">{item.label}</p>
-            <p className="mt-1 text-sm leading-6 text-muted">{item.description}</p>
+            <div className="flex items-center gap-3">
+              <span
+                className={clsx(
+                  "h-8 w-1 rounded-full transition-colors",
+                  isActive ? "bg-accent" : "bg-transparent",
+                )}
+              />
+              <div className="min-w-0">
+                <p
+                  className={clsx(
+                    "text-sm font-semibold transition-colors",
+                    isActive ? "text-foreground" : "text-foreground",
+                  )}
+                >
+                  {item.label}
+                </p>
+                <p
+                  className={clsx(
+                    "mt-1 text-sm leading-5 transition-colors",
+                    isActive ? "text-foreground/80" : "text-muted",
+                  )}
+                >
+                  {item.description}
+                </p>
+              </div>
+            </div>
           </NextLink>
         );
       })}

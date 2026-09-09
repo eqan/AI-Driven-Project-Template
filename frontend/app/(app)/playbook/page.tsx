@@ -12,11 +12,11 @@ export default function PlaybookPage() {
           { href: "/", label: "Back to overview" },
           { href: "/backend-api", label: "Align with API", variant: "secondary" },
         ]}
-        asideDescription="The fastest teams repeat a small number of good moves: define the task, lock the contract, reuse the shell, and design the state path before polish."
-        asideTitle="Operating rhythm"
+        asideDescription="The team should be able to repeat the same delivery loop for a dashboard, form, queue view, or settings page without starting from scratch."
+        asideTitle="Working method"
         description="This is the repeatable build loop for shipping frontend features without losing state handling, product clarity, or integration discipline under pressure."
         eyebrow="Playbook"
-        heading="Use one rhythm for every new screen, form, and integration."
+        heading="Use one delivery loop for every practical feature."
         metrics={[
           {
             value: "4",

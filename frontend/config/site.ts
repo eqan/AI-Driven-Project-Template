@@ -1,107 +1,51 @@
-export type NavItem = {
-  label: string;
-  href: string;
-  description: string;
-};
+import type {
+  ArchitectureLayer,
+  BackendDomain,
+  CacheScenario,
+  DeliveryTrack,
+  IntegrationSurface,
+  NavItem,
+  Principle,
+  ProductArea,
+  ProofMetric,
+  QuickLink,
+  SiteConfig,
+  WorkflowStep,
+  WorkspaceSignal,
+} from "@/types/site";
 
-export type WorkspaceSignal = {
-  value: string;
-  label: string;
-  note: string;
-};
-
-export type ProofMetric = {
-  value: string;
-  label: string;
-  note: string;
-};
-
-export type ProductArea = {
-  title: string;
-  href: string;
-  status: string;
-  description: string;
-  outcome: string;
-};
-
-export type Principle = {
-  title: string;
-  description: string;
-};
-
-export type ArchitectureLayer = {
-  title: string;
-  description: string;
-};
-
-export type WorkflowStep = {
-  title: string;
-  description: string;
-};
-
-export type DeliveryTrack = {
-  title: string;
-  status: string;
-  description: string;
-};
-
-export type IntegrationSurface = {
-  title: string;
-  description: string;
-};
-
-export type BackendDomain = {
-  title: string;
-  route: string;
-  description: string;
-};
-
-export type CacheScenario = {
-  title: string;
-  recommendation: string;
-  description: string;
-};
-
-export type QuickLink = {
-  label: string;
-  href: string;
-  description: string;
-};
-
-export type SiteConfig = typeof siteConfig;
-
-export const siteConfig = {
+export const siteConfig: SiteConfig = {
   name: "Project Template",
-  productTagline: "Operator-ready SaaS workspace",
+  productTagline: "Practical SaaS workspace",
   description:
     "A SaaS-ready Next.js frontend shaped for protected routes, predictable product surfaces, and clean backend integration.",
   navItems: [
     {
       label: "Overview",
       href: "/",
-      description: "Workspace shell, scaling posture, and the current product surface.",
+      description: "Dashboard, modules, and immediate next actions.",
     },
     {
       label: "Architecture",
       href: "/architecture",
-      description: "Route groups, shell composition, and rendering boundaries.",
+      description: "Shell boundaries, route groups, and rendering ownership.",
     },
     {
       label: "Playbook",
       href: "/playbook",
-      description: "The repeatable delivery loop for frontend feature work.",
+      description: "Delivery sequence for new routes, states, and contracts.",
     },
     {
       label: "Backend API",
       href: "/backend-api",
-      description: "Integration posture for auth, tickets, stats, ingestion, and chat.",
+      description: "Frontend-facing contracts for auth, stats, tickets, and chat.",
     },
   ] satisfies NavItem[],
   proofMetrics: [
     {
       value: "4",
       label: "Core routes",
-      note: "Overview, architecture, playbook, and backend mapping all follow the same workspace pattern.",
+      note: "Overview, architecture, playbook, and backend mapping now share the same workspace pattern.",
     },
     {
       value: "1",
@@ -111,12 +55,12 @@ export const siteConfig = {
     {
       value: "3",
       label: "Next modules",
-      note: "Stats, ticketing, and chat can land without redesigning the app frame again.",
+      note: "Stats, ticketing, and chat can land without redesigning the shell again.",
     },
     {
       value: "0",
       label: "Filler sections",
-      note: "Every block is now meant to orient, prove readiness, or move the next implementation decision forward.",
+      note: "Every block should orient, prove readiness, or move the next implementation decision forward.",
     },
   ] satisfies ProofMetric[],
   workspaceSignals: [
@@ -147,9 +91,9 @@ export const siteConfig = {
       href: "/",
       status: "Start here",
       description:
-        "The operating page for product posture, route readiness, and what the next build steps should be.",
+        "Use this route as the operator dashboard for module readiness, route status, and immediate next actions.",
       outcome:
-        "Use this as the baseline for dashboards, launch checklists, and operator-facing summaries.",
+        "This becomes the baseline for real dashboard modules, launch checklists, and operator summaries.",
     },
     {
       title: "Architecture guide",
@@ -345,17 +289,17 @@ export const siteConfig = {
     {
       label: "Review architecture",
       href: "/architecture",
-      description: "See the route-group split and shell ownership at a glance.",
+      description: "Check the route split and shell ownership before expanding the app.",
     },
     {
       label: "Check the playbook",
       href: "/playbook",
-      description: "Use the feature-delivery loop before adding more screens.",
+      description: "Follow the delivery loop before adding forms, tables, or stateful flows.",
     },
     {
       label: "Plan API routes",
       href: "/backend-api",
-      description: "Map the next frontend module to a backend contract first.",
+      description: "Map the next frontend module to a backend contract before wiring UI.",
     },
   ] satisfies QuickLink[],
 };

@@ -12,11 +12,11 @@ export default function ArchitecturePage() {
           { href: "/playbook", label: "Open playbook" },
           { href: "/backend-api", label: "Inspect contracts", variant: "secondary" },
         ]}
-        asideDescription="This architecture is optimized for repeatability: the user should feel one product, and contributors should feel one obvious extension path."
-        asideTitle="Why this pattern holds"
+        asideDescription="The architecture should answer practical questions quickly: where auth lives, where route chrome lives, and where data wiring should start."
+        asideTitle="What this page clarifies"
         description="The frontend grows around route groups, one workspace shell, and centralized integration helpers instead of coupling every new page to a global template rewrite."
         eyebrow="Architecture"
-        heading="Add the next module without renegotiating the whole frontend."
+        heading="See the structure before adding the next module."
         metrics={siteConfig.workspaceSignals}
       />
 

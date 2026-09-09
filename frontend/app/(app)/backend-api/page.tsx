@@ -1,3 +1,4 @@
+import { BackendDomainTable } from "@/components/backend-domain-table";
 import { HeroBanner } from "@/components/hero-banner";
 import { InfoCard } from "@/components/info-card";
 import { SectionShell } from "@/components/section-shell";
@@ -11,11 +12,11 @@ export default function BackendApiPage() {
           { href: "/architecture", label: "Review boundaries" },
           { href: "/playbook", label: "Open workflow", variant: "secondary" },
         ]}
-        asideDescription="The safest frontend is boring at the edge: strict runtime config, one request layer, explicit freshness rules, and no secrets drifting into random browser state."
-        asideTitle="Integration posture"
+        asideDescription="A practical product shell needs concrete UI primitives too: tables, pagination, selects, dialogs, inputs, and predictable state handling around them."
+        asideTitle="Practical UI posture"
         description="The frontend is prepared for backend-backed routes by centralizing runtime checks, auth requests, cache decisions, and reusable route composition."
         eyebrow="Integration"
-        heading="Keep the API edge thin, typed, and hard to misuse."
+        heading="Keep the API edge practical, typed, and hard to misuse."
         metrics={[
           {
             value: "1",
@@ -57,24 +58,7 @@ export default function BackendApiPage() {
         eyebrow="Backend modules"
         title="Build on real contracts instead of inventing one-off route logic."
       >
-        <div className="rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.075),rgba(255,255,255,0.025))] p-7 shadow-[0_24px_95px_rgba(7,10,20,0.2)] backdrop-blur">
-          <div className="grid gap-5 xl:grid-cols-2">
-            {siteConfig.backendDomains.map((domain) => (
-              <article
-                key={domain.title}
-                className="rounded-[24px] border border-white/10 bg-black/10 p-5 dark:bg-white/4"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="text-xl font-semibold text-foreground">{domain.title}</h3>
-                  <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted">
-                    {domain.route}
-                  </span>
-                </div>
-                <p className="mt-3 text-sm leading-7 text-muted">{domain.description}</p>
-              </article>
-            ))}
-          </div>
-        </div>
+        <BackendDomainTable domains={siteConfig.backendDomains} />
       </SectionShell>
 
       <SectionShell
@@ -86,11 +70,11 @@ export default function BackendApiPage() {
           {siteConfig.cacheScenarios.map((scenario) => (
             <article
               key={scenario.title}
-              className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.025))] p-6 shadow-[0_20px_80px_rgba(7,10,20,0.16)] backdrop-blur"
+              className="rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_14px_40px_rgba(2,6,23,0.12)]"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className="text-xl font-semibold text-foreground">{scenario.title}</h3>
-                <span className="rounded-full border border-white/10 bg-black/12 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent/80 dark:bg-white/4">
+                <h3 className="text-lg font-semibold text-foreground">{scenario.title}</h3>
+                <span className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent/75">
                   {scenario.recommendation}
                 </span>
               </div>
